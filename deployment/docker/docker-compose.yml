@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 快捷导航应用服务
+  navigation-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: navigation-app
+    ports:
+      - "8000:8000"  # 前端HTTP服务端口
+      - "5001:5001"  # 后端API服务端口
+    volumes:
+      # 数据持久化：将数据库文件挂载到宿主机
+      - ./backend/database:/app/backend/database
+      # 开发模式：挂载代码目录（可选，生产环境可删除）
+      - ./frontend:/app/frontend
+      - ./backend:/app/backend
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - navigation-network
+
+  # Nginx反向代理服务（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: navigation-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - navigation-app
+    restart: unless-stopped
+    networks:
+      - navigation-network
+    profiles:
+      - production  # 只在生产环境启用
+
+networks:
+  navigation-network:
+    driver: bridge
+
+volumes:
+  navigation-data:
+    driver: local

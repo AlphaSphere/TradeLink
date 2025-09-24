@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="format-detection" content="telephone=no, email=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="导航管理">
+    <title>跨境电商工具导航 - 管理后台</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 移动端汉堡菜单按钮 -->
+        <button class="mobile-menu-toggle d-md-none" onclick="toggleAdminSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        
+        <!-- 移动端遮罩层 -->
+        <div class="admin-overlay" onclick="closeAdminSidebar()"></div>
+        
+        <!-- 侧边栏导航 -->
+        <div class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <h3>导航管理系统</h3>
+                <!-- 移动端关闭按钮 -->
+                <button class="sidebar-close d-md-none" onclick="closeAdminSidebar()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active" data-target="dashboard">
+                    <i class="bi bi-speedometer2"></i> 
+                    <span class="menu-text">控制面板</span>
+                </li>
+                <li data-target="categories">
+                    <i class="bi bi-folder"></i> 
+                    <span class="menu-text">分类管理</span>
+                </li>
+                <li data-target="websites">
+                    <i class="bi bi-globe"></i> 
+                    <span class="menu-text">网站管理</span>
+                </li>
+                <li data-target="navigation">
+                    <i class="bi bi-compass"></i> 
+                    <span class="menu-text">快捷导航</span>
+                </li>
+                <li data-target="users">
+                    <i class="bi bi-people"></i> 
+                    <span class="menu-text">用户管理</span>
+                </li>
+                <li data-target="settings">
+                    <i class="bi bi-gear"></i> 
+                    <span class="menu-text">系统设置</span>
+                </li>
+                <li>
+                    <a href="index.html" class="text-decoration-none text-white">
+                        <i class="bi bi-box-arrow-left"></i> 
+                        <span class="menu-text">返回前台</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="admin-main">
+            <!-- 顶部导航栏 -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="toggle-sidebar d-none d-md-block">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h4 class="page-title d-none d-sm-block">管理后台</h4>
+                </div>
+                <div class="header-right">
+                    <div class="admin-user">
+                        <img src="https://via.placeholder.com/40" alt="管理员头像" class="admin-avatar">
+                        <span class="admin-name d-none d-sm-inline">管理员</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="admin-content">
+                <!-- 控制面板 -->
+                <div class="content-section active" id="dashboard">
+                    <h2>控制面板</h2>
+                    <div class="dashboard-stats">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-primary">
+                                        <i class="bi bi-folder"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>分类总数</h3>
+                                        <p class="stat-number">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-success">
+                                        <i class="bi bi-globe"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>网站总数</h3>
+                                        <p class="stat-number">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-info">
+                                        <i class="bi bi-eye"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>访问量</h3>
+                                        <p class="stat-number">1,254</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-warning">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>用户数</h3>
+                                        <p class="stat-number">42</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>最近活动</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon bg-success">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <p>新增网站 "紫鸟浏览器"</p>
+                                    <small>2分钟前</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <p>更新分类 "跨境工具"</p>
+                                    <small>1小时前</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-info">
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <p>新用户注册</p>
+                                    <small>3小时前</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-danger">
+                                    <i class="bi bi-trash"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <p>删除网站 "过期工具"</p>
+                                    <small>昨天</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类管理 -->
+                <div class="content-section" id="categories">
+                    <h2>分类管理</h2>
+                    <div class="action-bar">
+                        <button class="btn btn-primary btn-sm" id="add-category">
+                            <i class="bi bi-plus"></i> 
+                            <span class="d-none d-sm-inline">添加分类</span>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>分类名称</th>
+                                    <th class="d-none d-md-table-cell">图标</th>
+                                    <th class="d-none d-sm-table-cell">网站数量</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载的分类数据将在这里显示 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 网站管理 -->
+                <div class="content-section" id="websites">
+                    <h2>网站管理</h2>
+                    <div class="action-bar">
+                        <button class="btn btn-primary btn-sm" id="add-website">
+                            <i class="bi bi-plus"></i> 
+                            <span class="d-none d-sm-inline">添加网站</span>
+                        </button>
+                        <div class="search-bar">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="搜索网站...">
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>网站名称</th>
+                                    <th class="d-none d-md-table-cell">图标</th>
+                                    <th class="d-none d-sm-table-cell">分类</th>
+                                    <th class="d-none d-lg-table-cell">描述</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载的网站数据将在这里显示 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination d-flex justify-content-between align-items-center">
+                        <button class="btn btn-sm btn-outline-secondary">上一页</button>
+                        <span class="page-info">第 1 页 / 共 5 页</span>
+                        <button class="btn btn-sm btn-outline-secondary">下一页</button>
+                    </div>
+                </div>
+
+                <!-- 快捷导航管理 -->
+                <div class="content-section" id="navigation">
+                    <h2>快捷导航管理</h2>
+                    <div class="action-bar">
+                        <button class="btn btn-primary btn-sm" id="add-navigation">
+                            <i class="bi bi-plus"></i> 
+                            <span class="d-none d-sm-inline">添加导航项</span>
+                        </button>
+                        <div class="search-bar">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="navigation-search" placeholder="搜索导航项...">
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>名称</th>
+                                    <th class="d-none d-md-table-cell">Logo</th>
+                                    <th class="d-none d-lg-table-cell">图标</th>
+                                    <th class="d-none d-sm-table-cell">链接</th>
+                                    <th class="d-none d-md-table-cell">排序</th>
+                                    <th class="d-none d-sm-table-cell">状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="navigation-table-body">
+                                <!-- 动态加载的快捷导航数据将在这里显示 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination d-flex justify-content-between align-items-center">
+                        <button class="btn btn-sm btn-outline-secondary" id="nav-prev-page">上一页</button>
+                        <span class="page-info" id="nav-page-info">第 1 页 / 共 1 页</span>
+                        <button class="btn btn-sm btn-outline-secondary" id="nav-next-page">下一页</button>
+                    </div>
+                </div>
+
+                <!-- 用户管理 -->
+                <div class="content-section" id="users">
+                    <h2>用户管理</h2>
+                    <div class="action-bar">
+                        <button class="btn btn-primary btn-sm" id="add-user">
+                            <i class="bi bi-plus"></i> 
+                            <span class="d-none d-sm-inline">添加用户</span>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th class="d-none d-sm-table-cell">邮箱</th>
+                                    <th class="d-none d-md-table-cell">角色</th>
+                                    <th class="d-none d-lg-table-cell">注册时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>admin</td>
+                                    <td class="d-none d-sm-table-cell">admin@example.com</td>
+                                    <td class="d-none d-md-table-cell">管理员</td>
+                                    <td class="d-none d-lg-table-cell">2023-01-01</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-primary" title="编辑">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-danger" title="删除">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>editor</td>
+                                    <td class="d-none d-sm-table-cell">editor@example.com</td>
+                                    <td class="d-none d-md-table-cell">编辑</td>
+                                    <td class="d-none d-lg-table-cell">2023-02-15</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-primary" title="编辑">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-danger" title="删除">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>user1</td>
+                                    <td class="d-none d-sm-table-cell">user1@example.com</td>
+                                    <td class="d-none d-md-table-cell">普通用户</td>
+                                    <td class="d-none d-lg-table-cell">2023-03-20</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-primary" title="编辑">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-danger" title="删除">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 系统设置 -->
+                <div class="content-section" id="settings">
+                    <h2>系统设置</h2>
+                    <div class="settings-form">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>基本设置</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="site-name" class="form-label">网站名称</label>
+                                        <input type="text" class="form-control" id="site-name" value="跨境电商工具导航">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="site-description" class="form-label">网站描述</label>
+                                        <textarea class="form-control" id="site-description" rows="3">跨境电商工具导航是一个专为跨境电商从业者提供各类工具和资源的导航平台。</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="site-logo" class="form-label">网站Logo</label>
+                                        <input type="file" class="form-control" id="site-logo">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">保存设置</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>高级设置</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="enable-cache" checked>
+                                        <label class="form-check-label" for="enable-cache">启用缓存</label>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="enable-analytics" checked>
+                                        <label class="form-check-label" for="enable-analytics">启用访问统计</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cache-time" class="form-label">缓存时间（分钟）</label>
+                                        <input type="number" class="form-control" id="cache-time" value="60">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">保存设置</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 添加分类 -->
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加分类</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="category-form">
+                        <div class="mb-3">
+                            <label for="category-name" class="form-label">分类名称</label>
+                            <input type="text" class="form-control" id="category-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category-icon" class="form-label">图标类名</label>
+                            <input type="text" class="form-control" id="category-icon" placeholder="bi-folder">
+                            <div class="form-text">使用Bootstrap Icons类名，例如：bi-folder</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-category">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 添加网站 -->
+    <div class="modal fade" id="websiteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加网站</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="website-form">
+                        <div class="mb-3">
+                            <label for="website-name" class="form-label">网站名称</label>
+                            <input type="text" class="form-control" id="website-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="website-url" class="form-label">网站URL</label>
+                            <input type="url" class="form-control" id="website-url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="website-category" class="form-label">所属分类</label>
+                            <select class="form-select" id="website-category" required>
+                                <option value="">选择分类</option>
+                                <option value="1">数据分析工具</option>
+                                <option value="2">关键词工具</option>
+                                <option value="3">物流工具</option>
+                                <option value="4">支付工具</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="website-icon" class="form-label">网站图标URL</label>
+                            <input type="url" class="form-control" id="website-icon">
+                        </div>
+                        <div class="mb-3">
+                            <label for="website-desc" class="form-label">网站描述</label>
+                            <textarea class="form-control" id="website-desc" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-website">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 添加/编辑快捷导航 -->
+    <div class="modal fade" id="navigationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="navigation-modal-title">添加快捷导航</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="navigation-form">
+                        <input type="hidden" id="navigation-id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-name" class="form-label">导航名称 *</label>
+                                    <input type="text" class="form-control" id="navigation-name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-url" class="form-label">链接地址 *</label>
+                                    <input type="url" class="form-control" id="navigation-url" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-logo" class="form-label">Logo图片URL</label>
+                                    <div class="input-group">
+                                        <input type="url" class="form-control" id="navigation-logo" placeholder="https://example.com/logo.png" oninput="previewLogo()" onblur="autoGenerateLogo()">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleLogoInputMode()">
+                                            <i class="bi bi-arrow-repeat"></i> 切换模式
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">留空将自动根据网站域名生成Logo</small>
+                                    <div id="logoPreview" class="logo-preview mt-2" style="display: none;">
+                                        <img src="" alt="Logo预览" style="max-width: 50px; max-height: 50px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-icon" class="form-label">备用图标</label>
+                                    <input type="text" class="form-control" id="navigation-icon" placeholder="bi-globe">
+                                    <div class="form-text">Bootstrap图标类名，如：bi-globe</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-sort" class="form-label">排序权重</label>
+                                    <input type="number" class="form-control" id="navigation-sort" value="0" min="0">
+                                    <div class="form-text">数字越大排序越靠前</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="navigation-status" class="form-label">状态</label>
+                                    <select class="form-select" id="navigation-status">
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Logo预览</label>
+                            <div class="logo-preview-container">
+                                <div class="logo-preview" id="logo-preview">
+                                    <i class="bi bi-image" style="font-size: 32px; color: #ccc;"></i>
+                                    <div class="preview-text">暂无图片</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-navigation" onclick="saveNavigation()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/index.js"></script>
+    <script src="../assets/js/admin.js"></script>
+    
+    <!-- 移动端交互脚本 -->
+    <script>
+        // 移动端侧边栏控制
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 汉堡菜单按钮事件
+            const hamburgerBtn = document.querySelector('.hamburger-menu');
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', toggleSidebar);
+            }
+            
+            // 侧边栏关闭按钮事件
+            const closeBtns = document.querySelectorAll('.sidebar-close, .sidebar-overlay');
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', closeSidebar);
+            });
+            
+            // 侧边栏导航项点击事件（移动端自动关闭侧边栏）
+            const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+            
+            // 检测触摸设备并添加相应类
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                document.body.classList.add('touch-device');
+            }
+            
+            // 响应式表格处理
+            function handleResponsiveTables() {
+                const tables = document.querySelectorAll('.table-responsive table');
+                tables.forEach(table => {
+                    // 为移动端添加滚动提示
+                    if (window.innerWidth <= 768) {
+                        const wrapper = table.closest('.table-responsive');
+                        if (wrapper && !wrapper.querySelector('.scroll-hint')) {
+                            const hint = document.createElement('div');
+                            hint.className = 'scroll-hint text-muted small';
+                            hint.innerHTML = '<i class="bi bi-arrow-left-right"></i> 左右滑动查看更多';
+                            wrapper.appendChild(hint);
+                        }
+                    }
+                });
+            }
+            
+            // 初始化响应式表格
+            handleResponsiveTables();
+            
+            // 窗口大小改变时重新处理
+            window.addEventListener('resize', handleResponsiveTables);
+            
+            // 模态框优化（如果存在）
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('shown.bs.modal', function() {
+                    // 移动端模态框显示时禁止背景滚动
+                    if (window.innerWidth <= 768) {
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+                
+                modal.addEventListener('hidden.bs.modal', function() {
+                    // 模态框隐藏时恢复背景滚动
+                    document.body.style.overflow = '';
+                });
+            });
+            
+            // 表单输入框焦点优化（移动端）
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    if (window.innerWidth <= 768) {
+                        // 移动端输入框获得焦点时，延迟滚动到视图中
+                        setTimeout(() => {
+                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                });
+            });
+            
+            // 长按菜单支持（移动端）
+            let longPressTimer;
+            const actionButtons = document.querySelectorAll('.btn-group .btn');
+            
+            actionButtons.forEach(button => {
+                button.addEventListener('touchstart', function(e) {
+                    longPressTimer = setTimeout(() => {
+                        // 长按显示操作提示
+                        const title = this.getAttribute('title');
+                        if (title) {
+                            // 创建临时提示
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'mobile-tooltip';
+                            tooltip.textContent = title;
+                            tooltip.style.cssText = `
+                                position: fixed;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                background: rgba(0,0,0,0.8);
+                                color: white;
+                                padding: 8px 12px;
+                                border-radius: 4px;
+                                font-size: 14px;
+                                z-index: 9999;
+                                pointer-events: none;
+                            `;
+                            document.body.appendChild(tooltip);
+                            
+                            setTimeout(() => {
+                                if (tooltip.parentNode) {
+                                    tooltip.parentNode.removeChild(tooltip);
+                                }
+                            }, 1500);
+                        }
+                    }, 500);
+                });
+                
+                button.addEventListener('touchend', function() {
+                    clearTimeout(longPressTimer);
+                });
+                
+                button.addEventListener('touchmove', function() {
+                    clearTimeout(longPressTimer);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

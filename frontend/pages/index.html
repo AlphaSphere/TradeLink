@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="跨境电商工具导航">
+    <title>跨境电商工具导航</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- 引入数据和脚本 -->
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/index.js" defer></script>
+    <script>
+        // 加载组件的函数
+        function loadComponent(url, elementId) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById(elementId).innerHTML = data;
+                })
+                .catch(error => console.error('加载组件出错:', error));
+        }
+
+        // 初始化主页卡片函数 - 简化版本
+        function initializeIndexPage() {
+            console.log('初始化主页卡片数据', cardData);
+            
+            try {
+                // 检查卡片数据是否存在，如果不存在则使用默认数据
+                if (!cardData || !cardData.countries || !cardData.categories) {
+                    console.warn('未找到卡片数据，使用默认数据');
+                    // 创建默认数据
+                    cardData = {
+                        countries: [
+                            { name: "美国", icon: "https://cdn-icons-png.flaticon.com/128/197/197484.png", link: "#usa" },
+                            { name: "英国", icon: "https://cdn-icons-png.flaticon.com/128/197/197374.png", link: "#uk" },
+                            { name: "中国", icon: "https://cdn-icons-png.flaticon.com/128/197/197375.png", link: "#china" },
+                            { name: "日本", icon: "https://cdn-icons-png.flaticon.com/128/197/197604.png", link: "#japan" }
+                        ],
+                        categories: [
+                            {
+                                title: "数据分析工具",
+                                displayName: "数据分析工具",
+                                icon: "bi-bar-chart-fill",
+                                tools: [
+                                    { 
+                                        name: "数据分析工具1", 
+                                        description: "这是一个默认的数据分析工具示例", 
+                                        icon: "https://cdn-icons-png.flaticon.com/128/2910/2910791.png"
+                                    },
+                                    { 
+                                        name: "数据分析工具2", 
+                                        description: "这是另一个默认的数据分析工具示例", 
+                                        icon: "https://cdn-icons-png.flaticon.com/128/2910/2910791.png"
+                                    }
+                                ]
+                            },
+                            {
+                                title: "AI工具",
+                                displayName: "AI工具",
+                                icon: "bi-robot",
+                                tools: [
+                                    { 
+                                        name: "AI工具1", 
+                                        description: "这是一个默认的AI工具示例", 
+                                        icon: "https://cdn-icons-png.flaticon.com/128/8637/8637854.png"
+                                    },
+                                    { 
+                                        name: "AI工具2", 
+                                        description: "这是另一个默认的AI工具示例", 
+                                        icon: "https://cdn-icons-png.flaticon.com/128/8637/8637854.png"
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+                }
+                
+                // createCountryCard函数已在components/card.html中定义，无需重复定义
+                
+                // 初始化国家/地区站点
+                console.log('开始创建国家卡片...');
+                const countryCards = [];
+                cardData.countries.forEach(country => {
+                    console.log('创建国家卡片:', country.name);
+                    const card = window.createCountryCard(country.name, country.icon, country.link);
+                    if (card) {
+                        countryCards.push(card);
+                    }
+                });
+                
+                console.log('创建了', countryCards.length, '个国家卡片');
+                
+                // 添加国家/地区站点卡片到容器
+                let countryContainer = document.getElementById('country-cards');
+                if (!countryContainer) {
+                    // 如果找不到country-cards，尝试找country-sites-container
+                    countryContainer = document.getElementById('country-sites-container');
+                    
+                    // 如果仍然找不到，则创建一个新的容器
+                    if (!countryContainer) {
+                        console.log('创建国家/地区容器');
+                        const newContainer = document.createElement('div');
+                        newContainer.id = 'country-sites-container';
+                        newContainer.className = 'country-sites mt-4';
+                        
+                        // 添加标题
+                        const title = document.createElement('div');
+                        title.className = 'section-title';
+                        title.innerHTML = '<i class="bi bi-globe"></i> 国家/地区站点';
+                        newContainer.appendChild(title);
+                        
+                        // 添加卡片容器，使用row布局
+                        const cardsContainer = document.createElement('div');
+                        cardsContainer.id = 'country-cards';
+                        cardsContainer.className = 'row country-cards';
+                        newContainer.appendChild(cardsContainer);
+                        
+                        // 将新容器添加到主内容区域
+                        const mainContent = document.querySelector('.main-content');
+                        if (mainContent) {
+                            mainContent.appendChild(newContainer);
+                        } else {
+                            document.body.appendChild(newContainer);
+                        }
+                        
+                        // 更新引用
+                        countryContainer = cardsContainer;
+                    }
+                }
+                
+                // 清空容器并添加卡片
+                if (countryContainer) {
+                    console.log('添加国家卡片到容器');
+                    countryContainer.innerHTML = '';
+                    countryCards.forEach(card => {
+                        countryContainer.appendChild(card);
+                    });
+                    console.log('国家卡片添加完成');
+                } else {
+                    console.error('找不到国家卡片容器');
+                }
+                
+                // 初始化所有分类工具
+                cardData.categories.forEach(category => {
+                    // 创建工具卡片
+                    const toolCards = [];
+                    category.tools.forEach(tool => {
+                        toolCards.push(createWebsiteCard(tool.name, tool.description, tool.icon));
+                    });
+                    
+                    // 获取分类容器
+                    const categoryId = category.title;
+                    let categoryContainer = document.getElementById(categoryId + '-cards');
+                    
+                    // 如果容器不存在，则创建
+                    if (!categoryContainer) {
+                        console.log('创建分类容器:', categoryId);
+                        
+                        // 创建分类区域
+                        const categorySection = document.createElement('div');
+                        categorySection.id = categoryId + '-section';
+                        categorySection.className = 'category-section mt-4';
+                        
+                        // 添加标题
+                        const title = document.createElement('div');
+                        title.className = 'section-title';
+                        title.innerHTML = `<i class="bi ${category.icon}"></i> ${category.displayName || category.title}`;
+                        categorySection.appendChild(title);
+                        
+                        // 添加卡片容器，使用UL标签实现横向排列
+                        const cardsContainer = document.createElement('ul');
+                        cardsContainer.id = categoryId + '-cards';
+                        cardsContainer.className = 'website-cards';
+                        categorySection.appendChild(cardsContainer);
+                        
+                        // 将分类区域添加到主分类容器
+                        const categoriesContainer = document.getElementById('categories-container');
+                        if (categoriesContainer) {
+                            categoriesContainer.appendChild(categorySection);
+                        } else {
+                            const mainContent = document.querySelector('.main-content');
+                            if (mainContent) {
+                                mainContent.appendChild(categorySection);
+                            } else {
+                                document.body.appendChild(categorySection);
+                            }
+                        }
+                        
+                        // 更新引用
+                        categoryContainer = cardsContainer;
+                    }
+                    
+                    // 清空容器
+                    categoryContainer.innerHTML = '';
+                    
+                    // 添加工具卡片到容器
+                    toolCards.forEach(card => {
+                        categoryContainer.appendChild(card);
+                    });
+                });
+            } catch (error) {
+                console.error('初始化卡片失败:', error);
+                alert('初始化卡片失败，请刷新页面重试');
+            }
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载头部导航
+            loadComponent('../components/header.html', 'header-component');
+            // 加载侧边栏
+            loadComponent('../components/sidebar.html', 'sidebar-component');
+            // 加载底部信息
+            loadComponent('../components/footer.html', 'footer-component');
+            
+            // 加载导航卡片组件 - 最重要的组件，需要先加载完成
+            fetch('../components/card.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('card-component').innerHTML = data;
+                    console.log('卡片组件已加载，等待脚本执行...');
+                    
+                    // 确保卡片组件中的脚本执行完毕
+                    setTimeout(() => {
+                        console.log('检查卡片函数是否已定义...');
+                        if (typeof window.createCountryCard === 'function' && 
+                            typeof window.createWebsiteCard === 'function' &&
+                            typeof window.createCategorySection === 'function') {
+                            console.log('卡片函数已加载，开始初始化...');
+                            initializeIndexPage();
+                        } else {
+                            console.error('卡片函数未定义，无法初始化');
+                            console.log('createCountryCard:', typeof window.createCountryCard);
+                            console.log('createWebsiteCard:', typeof window.createWebsiteCard);
+                            console.log('createCategorySection:', typeof window.createCategorySection);
+                        }
+                    }, 2000); // 减少延迟时间到2秒
+                })
+                .catch(error => {
+                    console.error('加载卡片组件失败:', error);
+                    alert('加载卡片组件失败，请刷新页面重试');
+                });
+        });
+    </script>
+</head>
+<body>
+    <!-- 移动端汉堡菜单按钮 -->
+    <button class="navbar-toggler d-md-none" type="button" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- 移动端遮罩层 -->
+    <div class="overlay" onclick="closeSidebar()"></div>
+
+    <!-- 头部导航组件 -->
+    <div id="header-component"></div>
+
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <div class="row">
+            <!-- 左侧侧边栏组件 -->
+            <div class="col-md-2 sidebar" id="sidebar">
+                <div class="sidebar-header d-md-none">
+                    <h5>导航菜单</h5>
+                    <button class="sidebar-close" onclick="closeSidebar()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div id="sidebar-component"></div>
+            </div>
+            
+            <!-- 主内容区域 -->
+            <div class="col-md-10 main-content">
+                <!-- 网站LOGO和搜索区域 -->
+                <div class="site-header text-center py-4">
+                    <!-- 搜索区域 -->
+                    <div class="search-container">
+                        <div class="search-tabs">
+                            <button class="search-tab active" data-engine="baidu">百度</button>
+                            <button class="search-tab" data-engine="google">Google</button>
+                            <button class="search-tab" data-engine="bing">Bing</button>
+                            <button class="search-tab" data-engine="yahoo">Yahoo</button>
+                            <button class="search-tab" data-engine="yandex">Yandex</button>
+                        </div>
+                        <div class="search-box-main">
+                            <input type="text" class="form-control main-search" placeholder="输入关键词搜索..." autocomplete="off">
+                            <button class="btn btn-search" onclick="performSearch()">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 时间和日期显示 -->
+                <div class="date-container">
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <div class="date-box">
+                                <i class="bi bi-calendar"></i> 
+                                <span class="d-none d-sm-inline">美东时间: </span>
+                                <span class="d-sm-none">美东: </span>
+                                <span id="us-time">10:30:20</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="date-box">
+                                <i class="bi bi-calendar"></i> 
+                                <span class="d-none d-sm-inline">英国时间: </span>
+                                <span class="d-sm-none">英国: </span>
+                                <span id="uk-time">15:30:20</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="date-box">
+                                <i class="bi bi-calendar"></i> 
+                                <span class="d-none d-sm-inline">德国时间: </span>
+                                <span class="d-sm-none">德国: </span>
+                                <span id="de-time">16:30:20</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="date-box">
+                                <i class="bi bi-calendar"></i> 
+                                <span class="d-none d-sm-inline">中国时间: </span>
+                                <span class="d-sm-none">中国: </span>
+                                <span id="cn-time">22:30:20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 快捷导航区域 -->
+                <div class="quick-nav">
+                    <div class="nav-buttons">
+                        <button class="nav-btn active" data-platform="tradelink">TradeLink</button>
+                        <button class="nav-btn" data-platform="amazon">亚马逊</button>
+                        <button class="nav-btn" data-platform="ebay">eBay</button>
+                        <button class="nav-btn" data-platform="shopify">Shopify</button>
+                        <button class="nav-btn" data-platform="tiktok">TikTok Shop</button>
+                        <button class="nav-btn" data-platform="aliexpress">速卖通</button>
+                        <button class="nav-btn" data-platform="wish">Wish</button>
+                        <button class="nav-btn" data-platform="ecommerce">跨境电商</button>
+                        <button class="nav-btn" data-platform="training">亚马逊培训</button>
+                        <button class="nav-btn" data-platform="tools">亚马逊工具</button>
+                    </div>
+                </div>
+                
+                <!-- 导航卡片组件 -->
+                <div id="card-component"></div>
+                
+                <!-- 国家/地区站点 -->
+                <div id="country-sites-container"></div>
+                
+                <!-- 网站分类展示 -->
+                <div id="categories-container" class="website-categories mt-4">
+                    <!-- 工具分类容器 -->
+                    <div id="tool-categories" class="tool-categories-container"></div>
+                </div>
+                
+                <!-- 更多分类... -->
+                
+                
+                <!-- 返回顶部按钮 -->
+                <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+                
+                <!-- 侧边工具栏 -->
+                <div class="side-toolbar d-none d-md-flex">
+                    <button class="toolbar-btn" title="分享" onclick="shareWebsite()">
+                        <i class="bi bi-share"></i>
+                    </button>
+                    <button class="toolbar-btn" title="收藏" onclick="bookmarkWebsite()">
+                        <i class="bi bi-bookmark"></i>
+                    </button>
+                    <button class="toolbar-btn" title="反馈" onclick="showFeedback()">
+                        <i class="bi bi-chat-dots"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息组件 -->
+    <div id="footer-component"></div>
+
+    <!-- JavaScript 引入 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 移动端交互脚本 -->
+    <script>
+        // 侧边栏控制函数
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+            
+            // 防止背景滚动
+            if (sidebar.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // 搜索功能
+        function performSearch() {
+            const searchInput = document.querySelector('.main-search');
+            const activeTab = document.querySelector('.search-tab.active');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                searchInput.focus();
+                return;
+            }
+            
+            const engine = activeTab.getAttribute('data-engine') || 'baidu';
+            const searchUrls = {
+                baidu: `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`,
+                google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                bing: `https://www.bing.com/search?q=${encodeURIComponent(query)}`,
+                yahoo: `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`,
+                yandex: `https://yandex.com/search/?text=${encodeURIComponent(query)}`
+            };
+            
+            window.open(searchUrls[engine], '_blank');
+        }
+        
+        // 搜索引擎切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchTabs = document.querySelectorAll('.search-tab');
+            const searchInput = document.querySelector('.main-search');
+            
+            searchTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    searchTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 回车搜索
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+        
+        // 快捷导航按钮交互
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const platform = this.getAttribute('data-platform');
+                    console.log('切换到平台:', platform);
+                    // 这里可以添加平台切换逻辑
+                });
+            });
+        });
+        
+        // 返回顶部功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // 显示/隐藏返回顶部按钮
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        
+        // 工具栏功能
+        function shareWebsite() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '跨境电商工具导航',
+                    text: '发现最好的跨境电商工具和资源',
+                    url: window.location.href
+                });
+            } else {
+                // 复制链接到剪贴板
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('链接已复制到剪贴板');
+                });
+            }
+        }
+        
+        function bookmarkWebsite() {
+            alert('请使用浏览器的收藏功能添加书签');
+        }
+        
+        function showFeedback() {
+            alert('感谢您的反馈！请发送邮件至 feedback@example.com');
+        }
+        
+        // 实时时间更新
+        function updateTimes() {
+            const now = new Date();
+            
+            // 美东时间 (UTC-5/-4)
+            const usTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            document.getElementById('us-time').textContent = usTime.toLocaleTimeString();
+            
+            // 英国时间 (UTC+0/+1)
+            const ukTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+            document.getElementById('uk-time').textContent = ukTime.toLocaleTimeString();
+            
+            // 德国时间 (UTC+1/+2)
+            const deTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Berlin"}));
+            document.getElementById('de-time').textContent = deTime.toLocaleTimeString();
+            
+            // 中国时间 (UTC+8)
+            const cnTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
+            document.getElementById('cn-time').textContent = cnTime.toLocaleTimeString();
+        }
+        
+        // 每秒更新时间
+        setInterval(updateTimes, 1000);
+        updateTimes(); // 立即更新一次
+        
+        // 触摸设备优化
+        if ('ontouchstart' in window) {
+            // 为触摸设备添加特殊样式
+            document.body.classList.add('touch-device');
+            
+            // 防止双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+    </script>
+</body>
+</html>
