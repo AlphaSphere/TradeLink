@@ -4,15 +4,28 @@ import os
 import json
 import sqlite3
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+import uuid
+import time
 
 # 加载环境变量 - 更新配置文件路径
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'config', '.env'))
 
 # 创建Flask应用
 app = Flask(__name__)
-# 配置CORS，允许所有来源和方法
-CORS(app, origins=['*'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-     allow_headers=['Content-Type', 'Authorization'])
+# 配置CORS，允许所有来源和方法，包括缓存控制头
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+                            "allow_headers": ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"]}},
+     supports_credentials=True)
+
+# 配置文件上传
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'frontend', 'assets', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# 确保上传目录存在
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 import logging
 
@@ -52,6 +65,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
+            title_en TEXT,
             icon TEXT DEFAULT 'bi-folder',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -62,7 +76,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS tools (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            name_en TEXT,
             description TEXT,
+            description_en TEXT,
             icon TEXT DEFAULT 'bi-link',
             url TEXT NOT NULL,
             category_id INTEGER NOT NULL,
@@ -220,9 +236,9 @@ def add_category():
         try:
             cursor = connection.cursor()
             
-            # 插入新分类
-            query = "INSERT INTO categories (title, icon) VALUES (?, ?)"
-            values = (data['title'], data.get('icon', 'bi-folder'))
+            # 插入新分类，包含英文名称字段
+            query = "INSERT INTO categories (title, title_en, icon) VALUES (?, ?, ?)"
+            values = (data['title'], data.get('title_en', ''), data.get('icon', 'bi-folder'))
             
             cursor.execute(query, values)
             connection.commit()
@@ -305,16 +321,18 @@ def add_tool():
             if not category:
                 return jsonify({"error": "指定的分类不存在"}), 400
             
-            # 插入新工具
+            # 插入新工具，包含英文名称和英文描述字段
             query = """
-            INSERT INTO tools (category_id, name, url, description, icon) 
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO tools (category_id, name, name_en, url, description, description_en, icon) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """
             values = (
                 data['category_id'],
                 data['name'],
+                data.get('name_en', ''),
                 data['url'],
                 data.get('description', ''),
+                data.get('description_en', ''),
                 data.get('icon', 'bi-link')
             )
             
@@ -412,9 +430,9 @@ def update_category(category_id):
         if not category:
             return jsonify({"error": "指定的分类不存在"}), 404
             
-        # 更新分类
-        query = "UPDATE categories SET title = ?, icon = ? WHERE id = ?"
-        values = (data['title'], data.get('icon', 'bi-folder'), category_id)
+        # 更新分类，包含英文名称字段
+        query = "UPDATE categories SET title = ?, title_en = ?, icon = ? WHERE id = ?"
+        values = (data['title'], data.get('title_en', ''), data.get('icon', 'bi-folder'), category_id)
         
         cursor.execute(query, values)
         conn.commit()
@@ -457,18 +475,20 @@ def update_tool(tool_id):
         if not category:
             return jsonify({"error": "指定的分类不存在"}), 400
             
-        # 更新工具
+        # 更新工具，包含英文名称和英文描述字段
         query = """
         UPDATE tools 
-        SET category_id = ?, name = ?, url = ?, description = ?, icon = ? 
+        SET name = ?, name_en = ?, description = ?, description_en = ?, icon = ?, url = ?, category_id = ?
         WHERE id = ?
         """
         values = (
-            data['category_id'],
             data['name'],
-            data['url'],
+            data.get('name_en', ''),
             data.get('description', ''),
+            data.get('description_en', ''),
             data.get('icon', 'bi-link'),
+            data['url'],
+            data['category_id'],
             tool_id
         )
         
@@ -693,14 +713,65 @@ def reorder_quick_navigation():
     finally:
         conn.close()
 
+def allowed_file(filename):
+    """
+    检查文件扩展名是否被允许
+    """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/upload-icon', methods=['POST'])
+def upload_icon():
+    """
+    上传图标文件
+    """
+    try:
+        # 检查是否有文件被上传
+        if 'file' not in request.files:
+            return jsonify({"error": "没有选择文件"}), 400
+        
+        file = request.files['file']
+        
+        # 检查文件名是否为空
+        if file.filename == '':
+            return jsonify({"error": "没有选择文件"}), 400
+        
+        # 检查文件类型
+        if not allowed_file(file.filename):
+            return jsonify({"error": "不支持的文件类型，请上传 PNG、JPG、JPEG、GIF、SVG 或 WEBP 格式的图片"}), 400
+        
+        # 生成安全的文件名
+        filename = secure_filename(file.filename)
+        file_extension = filename.rsplit('.', 1)[1].lower()
+        
+        # 生成唯一的文件名，避免冲突
+        unique_filename = f"{uuid.uuid4().hex}_{int(time.time())}.{file_extension}"
+        
+        # 保存文件
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file.save(file_path)
+        
+        # 返回文件的相对URL路径
+        icon_url = f"/assets/uploads/{unique_filename}"
+        
+        return jsonify({
+            "message": "图标上传成功",
+            "icon_url": icon_url,
+            "filename": unique_filename
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"图标上传失败: {e}")
+        return jsonify({"error": f"图标上传失败: {str(e)}"}), 500
+
 # 主函数
 if __name__ == '__main__':
     # 初始化数据库并导入初始数据
     init_db()
     import_initial_data()
     
-    # 获取端口号，默认为5002（避免与其他服务冲突）
-    port = int(os.environ.get('FLASK_RUN_PORT', 5002))
+    # 获取端口号，固定使用5001端口（与Docker配置保持一致）
+    port = int(os.environ.get('FLASK_RUN_PORT', 5001))
     
     # 启动Flask应用，绑定到0.0.0.0以允许外部访问
     # 生产环境中应该设置debug=False

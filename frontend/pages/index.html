@@ -7,245 +7,148 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="跨境电商工具导航">
+    <!-- 阻止浏览器请求Vite客户端文件 -->
+    <meta name="vite-dev-server" content="false">
+    <meta name="dev-server" content="false">
     <title>跨境电商工具导航</title>
+    <!-- 网站图标 -->
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <!-- 引入数据和脚本 -->
+    <link rel="stylesheet" href="../assets/css/language-switcher.css">
+    <!-- 引入数据和脚本 - 确保api.js先加载 -->
     <script src="../assets/js/api.js"></script>
+    <!-- 确保index.js在api.js之后加载 -->
     <script src="../assets/js/index.js" defer></script>
     <script>
         // 加载组件的函数
-        function loadComponent(url, elementId) {
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById(elementId).innerHTML = data;
-                })
-                .catch(error => console.error('加载组件出错:', error));
-        }
+        // 注意：此函数在下方有更完整的实现，这里移除重复定义
 
-        // 初始化主页卡片函数 - 简化版本
-        function initializeIndexPage() {
-            console.log('初始化主页卡片数据', cardData);
+        // 初始化首页内容
+        async function initializeIndexPage() {
+            
+            
+            // 标记页面已初始化，避免重复初始化
+            window.pageInitialized = true;
             
             try {
-                // 检查卡片数据是否存在，如果不存在则使用默认数据
-                if (!cardData || !cardData.countries || !cardData.categories) {
-                    console.warn('未找到卡片数据，使用默认数据');
-                    // 创建默认数据
-                    cardData = {
-                        countries: [
-                            { name: "美国", icon: "https://cdn-icons-png.flaticon.com/128/197/197484.png", link: "#usa" },
-                            { name: "英国", icon: "https://cdn-icons-png.flaticon.com/128/197/197374.png", link: "#uk" },
-                            { name: "中国", icon: "https://cdn-icons-png.flaticon.com/128/197/197375.png", link: "#china" },
-                            { name: "日本", icon: "https://cdn-icons-png.flaticon.com/128/197/197604.png", link: "#japan" }
-                        ],
-                        categories: [
-                            {
-                                title: "数据分析工具",
-                                displayName: "数据分析工具",
-                                icon: "bi-bar-chart-fill",
-                                tools: [
-                                    { 
-                                        name: "数据分析工具1", 
-                                        description: "这是一个默认的数据分析工具示例", 
-                                        icon: "https://cdn-icons-png.flaticon.com/128/2910/2910791.png"
-                                    },
-                                    { 
-                                        name: "数据分析工具2", 
-                                        description: "这是另一个默认的数据分析工具示例", 
-                                        icon: "https://cdn-icons-png.flaticon.com/128/2910/2910791.png"
-                                    }
-                                ]
-                            },
-                            {
-                                title: "AI工具",
-                                displayName: "AI工具",
-                                icon: "bi-robot",
-                                tools: [
-                                    { 
-                                        name: "AI工具1", 
-                                        description: "这是一个默认的AI工具示例", 
-                                        icon: "https://cdn-icons-png.flaticon.com/128/8637/8637854.png"
-                                    },
-                                    { 
-                                        name: "AI工具2", 
-                                        description: "这是另一个默认的AI工具示例", 
-                                        icon: "https://cdn-icons-png.flaticon.com/128/8637/8637854.png"
-                                    }
-                                ]
-                            }
-                        ]
-                    };
-                }
+                // 首先尝试加载动态数据
                 
-                // createCountryCard函数已在components/card.html中定义，无需重复定义
+                await loadCategoriesAndTools();
                 
-                // 初始化国家/地区站点
-                console.log('开始创建国家卡片...');
-                const countryCards = [];
-                cardData.countries.forEach(country => {
-                    console.log('创建国家卡片:', country.name);
-                    const card = window.createCountryCard(country.name, country.icon, country.link);
-                    if (card) {
-                        countryCards.push(card);
-                    }
-                });
                 
-                console.log('创建了', countryCards.length, '个国家卡片');
+                // 加载侧边栏分类
                 
-                // 添加国家/地区站点卡片到容器
-                let countryContainer = document.getElementById('country-cards');
-                if (!countryContainer) {
-                    // 如果找不到country-cards，尝试找country-sites-container
-                    countryContainer = document.getElementById('country-sites-container');
-                    
-                    // 如果仍然找不到，则创建一个新的容器
-                    if (!countryContainer) {
-                        console.log('创建国家/地区容器');
-                        const newContainer = document.createElement('div');
-                        newContainer.id = 'country-sites-container';
-                        newContainer.className = 'country-sites mt-4';
-                        
-                        // 添加标题
-                        const title = document.createElement('div');
-                        title.className = 'section-title';
-                        title.innerHTML = '<i class="bi bi-globe"></i> 国家/地区站点';
-                        newContainer.appendChild(title);
-                        
-                        // 添加卡片容器，使用row布局
-                        const cardsContainer = document.createElement('div');
-                        cardsContainer.id = 'country-cards';
-                        cardsContainer.className = 'row country-cards';
-                        newContainer.appendChild(cardsContainer);
-                        
-                        // 将新容器添加到主内容区域
-                        const mainContent = document.querySelector('.main-content');
-                        if (mainContent) {
-                            mainContent.appendChild(newContainer);
-                        } else {
-                            document.body.appendChild(newContainer);
-                        }
-                        
-                        // 更新引用
-                        countryContainer = cardsContainer;
-                    }
-                }
+                await loadSidebarCategories();
                 
-                // 清空容器并添加卡片
-                if (countryContainer) {
-                    console.log('添加国家卡片到容器');
-                    countryContainer.innerHTML = '';
-                    countryCards.forEach(card => {
-                        countryContainer.appendChild(card);
-                    });
-                    console.log('国家卡片添加完成');
-                } else {
-                    console.error('找不到国家卡片容器');
-                }
                 
-                // 初始化所有分类工具
-                cardData.categories.forEach(category => {
-                    // 创建工具卡片
-                    const toolCards = [];
-                    category.tools.forEach(tool => {
-                        toolCards.push(createWebsiteCard(tool.name, tool.description, tool.icon));
-                    });
-                    
-                    // 获取分类容器
-                    const categoryId = category.title;
-                    let categoryContainer = document.getElementById(categoryId + '-cards');
-                    
-                    // 如果容器不存在，则创建
-                    if (!categoryContainer) {
-                        console.log('创建分类容器:', categoryId);
-                        
-                        // 创建分类区域
-                        const categorySection = document.createElement('div');
-                        categorySection.id = categoryId + '-section';
-                        categorySection.className = 'category-section mt-4';
-                        
-                        // 添加标题
-                        const title = document.createElement('div');
-                        title.className = 'section-title';
-                        title.innerHTML = `<i class="bi ${category.icon}"></i> ${category.displayName || category.title}`;
-                        categorySection.appendChild(title);
-                        
-                        // 添加卡片容器，使用UL标签实现横向排列
-                        const cardsContainer = document.createElement('ul');
-                        cardsContainer.id = categoryId + '-cards';
-                        cardsContainer.className = 'website-cards';
-                        categorySection.appendChild(cardsContainer);
-                        
-                        // 将分类区域添加到主分类容器
-                        const categoriesContainer = document.getElementById('categories-container');
-                        if (categoriesContainer) {
-                            categoriesContainer.appendChild(categorySection);
-                        } else {
-                            const mainContent = document.querySelector('.main-content');
-                            if (mainContent) {
-                                mainContent.appendChild(categorySection);
-                            } else {
-                                document.body.appendChild(categorySection);
-                            }
-                        }
-                        
-                        // 更新引用
-                        categoryContainer = cardsContainer;
-                    }
-                    
-                    // 清空容器
-                    categoryContainer.innerHTML = '';
-                    
-                    // 添加工具卡片到容器
-                    toolCards.forEach(card => {
-                        categoryContainer.appendChild(card);
-                    });
-                });
             } catch (error) {
-                console.error('初始化卡片失败:', error);
-                alert('初始化卡片失败，请刷新页面重试');
+                console.error('加载动态数据失败:', error);
+                // 直接显示错误信息，不使用静态数据
+                alert('数据加载失败，请刷新页面重试或联系管理员');
+                throw new Error('数据加载失败: ' + error.message);
             }
+            
+            
         }
-
+        
         // 页面加载完成后执行
         document.addEventListener('DOMContentLoaded', function() {
-            // 加载头部导航
-            loadComponent('../components/header.html', 'header-component');
-            // 加载侧边栏
-            loadComponent('../components/sidebar.html', 'sidebar-component');
-            // 加载底部信息
-            loadComponent('../components/footer.html', 'footer-component');
             
-            // 加载导航卡片组件 - 最重要的组件，需要先加载完成
-            fetch('../components/card.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('card-component').innerHTML = data;
-                    console.log('卡片组件已加载，等待脚本执行...');
-                    
-                    // 确保卡片组件中的脚本执行完毕
-                    setTimeout(() => {
-                        console.log('检查卡片函数是否已定义...');
-                        if (typeof window.createCountryCard === 'function' && 
-                            typeof window.createWebsiteCard === 'function' &&
-                            typeof window.createCategorySection === 'function') {
-                            console.log('卡片函数已加载，开始初始化...');
+            
+            // 使用Promise.all确保所有组件都加载完成
+            Promise.all([
+                loadComponent('../components/header.html', 'header-component'),
+                loadComponent('../components/sidebar.html', 'sidebar-component'),
+                loadComponent('../components/footer.html', 'footer-component'),
+                loadComponent('../components/card.html', 'card-component')
+            ]).then(() => {
+                
+                
+                // 等待卡片函数加载完成
+                const checkCardFunctions = () => {
+                    if (typeof window.createCountryCard === 'function' && 
+                        typeof window.createWebsiteCard === 'function' &&
+                        typeof window.createCategorySection === 'function') {
+                        
+                        if (!window.pageInitialized) {
                             initializeIndexPage();
-                        } else {
-                            console.error('卡片函数未定义，无法初始化');
-                            console.log('createCountryCard:', typeof window.createCountryCard);
-                            console.log('createWebsiteCard:', typeof window.createWebsiteCard);
-                            console.log('createCategorySection:', typeof window.createCategorySection);
                         }
-                    }, 2000); // 减少延迟时间到2秒
-                })
-                .catch(error => {
-                    console.error('加载卡片组件失败:', error);
-                    alert('加载卡片组件失败，请刷新页面重试');
-                });
+                    } else {
+                        
+                        // 如果超过5次检查仍未加载成功，则强制初始化页面
+                        if (!window.cardFunctionCheckCount) {
+                            window.cardFunctionCheckCount = 1;
+                        } else {
+                            window.cardFunctionCheckCount++;
+                        }
+                        
+                        if (window.cardFunctionCheckCount > 5) {
+                            console.warn('卡片函数加载超时，强制初始化页面');
+                            // 定义缺失的函数以避免错误
+                            if (typeof window.createCountryCard !== 'function') {
+                                window.createCountryCard = function(name, iconUrl, link) {
+                                    console.warn('使用临时createCountryCard函数');
+                                    const li = document.createElement('li');
+                                    li.textContent = name;
+                                    return li;
+                                };
+                            }
+                            if (typeof window.createWebsiteCard !== 'function') {
+                                window.createWebsiteCard = function(name, description) {
+                                    console.warn('使用临时createWebsiteCard函数');
+                                    const div = document.createElement('div');
+                                    div.textContent = name;
+                                    return div;
+                                };
+                            }
+                            if (typeof window.createCategorySection !== 'function') {
+                                window.createCategorySection = function(title, iconClass, cards) {
+                                    console.warn('使用临时createCategorySection函数');
+                                    const section = document.createElement('section');
+                                    section.textContent = title;
+                                    return section;
+                                };
+                            }
+                            
+                            if (!window.pageInitialized) {
+                                initializeIndexPage();
+                            }
+                        } else {
+                            setTimeout(checkCardFunctions, 200);
+                        }
+                    }
+                };
+                
+                // 开始检查卡片函数
+                checkCardFunctions();
+                
+            }).catch(error => {
+                console.error('组件加载失败:', error);
+                alert('页面组件加载失败，请刷新页面重试');
+            });
         });
+        
+        // 辅助函数：加载组件
+        function loadComponent(url, containerId) {
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`加载组件失败: ${url}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                        container.innerHTML = data;
+                        
+                    } else {
+                        throw new Error(`找不到容器: ${containerId}`);
+                    }
+                });
+        }
     </script>
 </head>
 <body>
@@ -266,7 +169,7 @@
             <!-- 左侧侧边栏组件 -->
             <div class="col-md-2 sidebar" id="sidebar">
                 <div class="sidebar-header d-md-none">
-                    <h5>导航菜单</h5>
+                    <h5 data-lang="navigationMenu">导航菜单</h5>
                     <button class="sidebar-close" onclick="closeSidebar()">
                         <i class="bi bi-x"></i>
                     </button>
@@ -276,19 +179,19 @@
             
             <!-- 主内容区域 -->
             <div class="col-md-10 main-content">
-                <!-- 网站LOGO和搜索区域 -->
+                <!-- 网站LOGO和搜索区域 - 固定内容 -->
                 <div class="site-header text-center py-4">
                     <!-- 搜索区域 -->
                     <div class="search-container">
                         <div class="search-tabs">
-                            <button class="search-tab active" data-engine="baidu">百度</button>
-                            <button class="search-tab" data-engine="google">Google</button>
-                            <button class="search-tab" data-engine="bing">Bing</button>
-                            <button class="search-tab" data-engine="yahoo">Yahoo</button>
-                            <button class="search-tab" data-engine="yandex">Yandex</button>
+                            <button class="search-tab active" data-engine="baidu" data-lang="baiduSearch">百度</button>
+                            <button class="search-tab" data-engine="google" data-lang="googleSearch">Google</button>
+                            <button class="search-tab" data-engine="bing" data-lang="bingSearch">Bing</button>
+                            <button class="search-tab" data-engine="yahoo" data-lang="yahooSearch">Yahoo</button>
+                            <button class="search-tab" data-engine="yandex" data-lang="yandexSearch">Yandex</button>
                         </div>
                         <div class="search-box-main">
-                            <input type="text" class="form-control main-search" placeholder="输入关键词搜索..." autocomplete="off">
+                            <input type="text" class="form-control main-search" data-lang-placeholder="searchPlaceholderMain" placeholder="输入关键词搜索..." autocomplete="off">
                             <button class="btn btn-search" onclick="performSearch()">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -296,70 +199,76 @@
                     </div>
                 </div>
                 
-                <!-- 时间和日期显示 -->
+                <!-- 时间和日期显示 - 固定内容 -->
                 <div class="date-container">
                     <div class="row g-2">
                         <div class="col-6 col-md-3">
                             <div class="date-box">
                                 <i class="bi bi-calendar"></i> 
-                                <span class="d-none d-sm-inline">美东时间: </span>
-                                <span class="d-sm-none">美东: </span>
+                                <span class="d-none d-sm-inline" data-lang="usTimeLabel">美东时间: </span>
+                                <span class="d-sm-none" data-lang="usTimeShort">美东: </span>
                                 <span id="us-time">10:30:20</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="date-box">
                                 <i class="bi bi-calendar"></i> 
-                                <span class="d-none d-sm-inline">英国时间: </span>
-                                <span class="d-sm-none">英国: </span>
+                                <span class="d-none d-sm-inline" data-lang="ukTimeLabel">英国时间: </span>
+                                <span class="d-sm-none" data-lang="ukTimeShort">英国: </span>
                                 <span id="uk-time">15:30:20</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="date-box">
                                 <i class="bi bi-calendar"></i> 
-                                <span class="d-none d-sm-inline">德国时间: </span>
-                                <span class="d-sm-none">德国: </span>
+                                <span class="d-none d-sm-inline" data-lang="deTimeLabel">德国时间: </span>
+                                <span class="d-sm-none" data-lang="deTimeShort">德国: </span>
                                 <span id="de-time">16:30:20</span>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="date-box">
                                 <i class="bi bi-calendar"></i> 
-                                <span class="d-none d-sm-inline">中国时间: </span>
-                                <span class="d-sm-none">中国: </span>
+                                <span class="d-none d-sm-inline" data-lang="cnTimeLabel">中国时间: </span>
+                                <span class="d-sm-none" data-lang="cnTimeShort">中国: </span>
                                 <span id="cn-time">22:30:20</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 快捷导航区域 -->
-                <div class="quick-nav">
+                <!-- 快捷导航区域 - 左右留白10% -->
+                <div class="quick-nav px-10">
+                    <h6 class="quick-nav-title">
+                        <i class="bi bi-compass"></i> 
+                        <span data-lang="quickNav">快捷导航</span>
+                    </h6>
                     <div class="nav-buttons">
-                        <button class="nav-btn active" data-platform="tradelink">TradeLink</button>
-                        <button class="nav-btn" data-platform="amazon">亚马逊</button>
-                        <button class="nav-btn" data-platform="ebay">eBay</button>
-                        <button class="nav-btn" data-platform="shopify">Shopify</button>
-                        <button class="nav-btn" data-platform="tiktok">TikTok Shop</button>
-                        <button class="nav-btn" data-platform="aliexpress">速卖通</button>
-                        <button class="nav-btn" data-platform="wish">Wish</button>
-                        <button class="nav-btn" data-platform="ecommerce">跨境电商</button>
-                        <button class="nav-btn" data-platform="training">亚马逊培训</button>
-                        <button class="nav-btn" data-platform="tools">亚马逊工具</button>
+                        <button class="nav-btn active" data-platform="tradelink" data-lang="tradeLink">TradeLink</button>
+                        <button class="nav-btn" data-platform="amazon" data-lang="amazon">亚马逊</button>
+                        <button class="nav-btn" data-platform="ebay" data-lang="ebay">eBay</button>
+                        <button class="nav-btn" data-platform="shopify" data-lang="shopify">Shopify</button>
+                        <button class="nav-btn" data-platform="tiktok" data-lang="tiktokShop">TikTok Shop</button>
+                        <button class="nav-btn" data-platform="aliexpress" data-lang="aliexpress">速卖通</button>
+                        <button class="nav-btn" data-platform="wish" data-lang="wish">Wish</button>
+                        <button class="nav-btn" data-platform="ecommerce" data-lang="crossBorderEcommerce">跨境电商</button>
+                        <button class="nav-btn" data-platform="training" data-lang="amazonTraining">亚马逊培训</button>
+                        <button class="nav-btn" data-platform="tools" data-lang="amazonTools">亚马逊工具</button>
                     </div>
                 </div>
                 
-                <!-- 导航卡片组件 -->
-                <div id="card-component"></div>
-                
-                <!-- 国家/地区站点 -->
-                <div id="country-sites-container"></div>
-                
-                <!-- 网站分类展示 -->
-                <div id="categories-container" class="website-categories mt-4">
-                    <!-- 工具分类容器 -->
-                    <div id="tool-categories" class="tool-categories-container"></div>
+                <!-- 动态内容容器 - 这个容器会被switchToSite函数清空和填充 -->
+                <div id="main-content">
+                    <!-- 导航卡片组件 -->
+                    <div id="card-component"></div>
+                    
+                    <!-- 国家/地区站点 -->
+                    <div id="country-sites-container"></div>
+                    
+                    <!-- 网站分类展示 -->
+                    <div id="categories-container" class="website-categories mt-4">
+                        <!-- 工具分类容器 -->
+                        <div id="tool-categories" class="tool-categories-container"></div>
+                    </div>
                 </div>
                 
                 <!-- 更多分类... -->
@@ -372,13 +281,13 @@
                 
                 <!-- 侧边工具栏 -->
                 <div class="side-toolbar d-none d-md-flex">
-                    <button class="toolbar-btn" title="分享" onclick="shareWebsite()">
+                    <button class="toolbar-btn" data-lang-title="shareTitle" title="分享" onclick="shareWebsite()">
                         <i class="bi bi-share"></i>
                     </button>
-                    <button class="toolbar-btn" title="收藏" onclick="bookmarkWebsite()">
+                    <button class="toolbar-btn" data-lang-title="bookmarkTitle" title="收藏" onclick="bookmarkWebsite()">
                         <i class="bi bi-bookmark"></i>
                     </button>
-                    <button class="toolbar-btn" title="反馈" onclick="showFeedback()">
+                    <button class="toolbar-btn" data-lang-title="feedbackTitle" title="反馈" onclick="showFeedback()">
                         <i class="bi bi-chat-dots"></i>
                     </button>
                 </div>
@@ -472,7 +381,7 @@
                     this.classList.add('active');
                     
                     const platform = this.getAttribute('data-platform');
-                    console.log('切换到平台:', platform);
+                    
                     // 这里可以添加平台切换逻辑
                 });
             });

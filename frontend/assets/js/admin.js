@@ -62,9 +62,33 @@ document.addEventListener('DOMContentLoaded', function() {
 // 加载分类数据
 async function loadCategories() {
     try {
-        const categories = await categoryApi.getAll();
+        
+        
+        // 获取分类数据响应
+        const response = await categoryApi.getAll();
+        
+        
+        // 正确访问响应数据 - API包装在data字段中
+        const categories = response.data || response;
+        
+        
+        // 确保数据是数组
+        if (!Array.isArray(categories)) {
+            throw new Error('分类数据格式错误，期望数组格式');
+        }
+        
         const tbody = document.querySelector('#categories table tbody');
+        if (!tbody) {
+            throw new Error('找不到分类表格容器');
+        }
+        
         tbody.innerHTML = '';
+        
+        // 如果没有分类数据，显示提示信息
+        if (categories.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">暂无分类数据</td></tr>';
+            return;
+        }
         
         categories.forEach(category => {
             const toolCount = category.tools ? category.tools.length : 0;
@@ -72,15 +96,24 @@ async function loadCategories() {
             row.innerHTML = `
                 <td>${category.id}</td>
                 <td>${category.title}</td>
-                <td><i class="${category.icon}"></i></td>
-                <td>${toolCount}</td>
+                <td class="d-none d-lg-table-cell">${category.title_en || '-'}</td>
+                <td class="d-none d-md-table-cell"><i class="${category.icon}"></i></td>
+                <td class="d-none d-sm-table-cell">${toolCount}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary edit-category" data-id="${category.id}"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-danger delete-category" data-id="${category.id}"><i class="bi bi-trash"></i></button>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-primary edit-category" data-id="${category.id}" title="编辑">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger delete-category" data-id="${category.id}" title="删除">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
         });
+        
+        
         
         // 绑定编辑和删除按钮事件
         bindCategoryEvents();
@@ -90,8 +123,16 @@ async function loadCategories() {
         if (statElements.length > 0) {
             statElements[0].textContent = categories.length;
         }
+        
     } catch (error) {
+        console.error('加载分类数据失败:', error);
         showAlert('加载分类数据失败: ' + error.message, 'danger');
+        
+        // 显示错误状态
+        const tbody = document.querySelector('#categories table tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">数据加载失败，请刷新页面重试</td></tr>';
+        }
     }
 }
 
@@ -101,11 +142,32 @@ function bindCategoryEvents() {
     document.querySelectorAll('.edit-category').forEach(button => {
         button.addEventListener('click', async function() {
             const categoryId = this.getAttribute('data-id');
-            const categories = await categoryApi.getAll();
-            const category = categories.find(c => c.id == categoryId);
             
-            if (category) {
-                showEditCategoryModal(category);
+            try {
+                // 获取分类数据响应
+                const response = await categoryApi.getAll();
+                
+                
+                // 正确访问响应数据 - API包装在data字段中
+                const categories = response.data || response;
+                
+                
+                // 确保数据是数组
+                if (!Array.isArray(categories)) {
+                    throw new Error('分类数据格式错误，期望数组格式');
+                }
+                
+                // 查找指定ID的分类
+                const category = categories.find(c => c.id == categoryId);
+                
+                if (category) {
+                    showEditCategoryModal(category);
+                } else {
+                    showAlert('未找到指定的分类', 'warning');
+                }
+            } catch (error) {
+                console.error('获取分类数据失败:', error);
+                showAlert('获取分类数据失败: ' + error.message, 'danger');
             }
         });
     });
@@ -426,7 +488,7 @@ async function deleteNavigation(navigationId) {
 function updateDashboardStats() {
     // 这个函数用于更新控制面板的统计数据
     // 可以在这里添加统计逻辑
-    console.log('更新控制面板统计数据');
+    
 }
 
 // Logo预览功能
@@ -461,6 +523,24 @@ function previewLogo() {
     }
 }
 
+// 图标预览功能
+function previewIcon(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    
+    if (input && input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="图标预览" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">`;
+            preview.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+
 // 自动生成Logo URL
 function autoGenerateLogo() {
     const urlInput = document.getElementById('navigationUrl');
@@ -473,7 +553,7 @@ function autoGenerateLogo() {
             logoInput.value = `https://logo.clearbit.com/${hostname}`;
             previewLogo();
         } catch (error) {
-            console.log('URL格式不正确，无法自动生成Logo');
+            
         }
     }
 }
@@ -531,6 +611,11 @@ function showAddCategoryModal() {
                             <input type="text" class="form-control" id="categoryTitle" required>
                         </div>
                         <div class="mb-3">
+                            <label for="categoryTitleEn" class="form-label">分类英文名称</label>
+                            <input type="text" class="form-control" id="categoryTitleEn" placeholder="请输入英文名称">
+                            <small class="text-muted">用于前台语言切换时显示</small>
+                        </div>
+                        <div class="mb-3">
                             <label for="categoryIcon" class="form-label">图标 (Bootstrap Icons类名)</label>
                             <input type="text" class="form-control" id="categoryIcon" placeholder="例如: bi-folder">
                             <small class="text-muted">访问 <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a> 查看可用图标</small>
@@ -553,6 +638,7 @@ function showAddCategoryModal() {
     // 绑定保存按钮事件
     document.getElementById('saveCategoryBtn').addEventListener('click', async function() {
         const title = document.getElementById('categoryTitle').value;
+        const title_en = document.getElementById('categoryTitleEn').value;
         const icon = document.getElementById('categoryIcon').value || 'bi-folder';
         
         if (!title) {
@@ -561,7 +647,8 @@ function showAddCategoryModal() {
         }
         
         try {
-            await categoryApi.add({ title, icon });
+            // 添加英文名称字段到请求数据中
+            await categoryApi.add({ title, title_en, icon });
             modalInstance.hide();
             showAlert('分类添加成功', 'success');
             loadCategories(); // 重新加载分类数据
@@ -596,6 +683,11 @@ function showEditCategoryModal(category) {
                             <input type="text" class="form-control" id="editCategoryTitle" value="${category.title}" required>
                         </div>
                         <div class="mb-3">
+                            <label for="editCategoryTitleEn" class="form-label">分类英文名称</label>
+                            <input type="text" class="form-control" id="editCategoryTitleEn" value="${category.title_en || ''}" placeholder="请输入英文名称">
+                            <small class="text-muted">用于前台语言切换时显示</small>
+                        </div>
+                        <div class="mb-3">
                             <label for="editCategoryIcon" class="form-label">图标 (Bootstrap Icons类名)</label>
                             <input type="text" class="form-control" id="editCategoryIcon" value="${category.icon}" placeholder="例如: bi-folder">
                             <small class="text-muted">访问 <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a> 查看可用图标</small>
@@ -618,6 +710,7 @@ function showEditCategoryModal(category) {
     // 绑定更新按钮事件
     document.getElementById('updateCategoryBtn').addEventListener('click', async function() {
         const title = document.getElementById('editCategoryTitle').value;
+        const title_en = document.getElementById('editCategoryTitleEn').value;
         const icon = document.getElementById('editCategoryIcon').value || 'bi-folder';
         
         if (!title) {
@@ -626,7 +719,8 @@ function showEditCategoryModal(category) {
         }
         
         try {
-            await categoryApi.update(category.id, { title, icon });
+            // 添加英文名称字段到更新数据中
+            await categoryApi.update(category.id, { title, title_en, icon });
             modalInstance.hide();
             showAlert('分类更新成功', 'success');
             loadCategories(); // 重新加载分类数据
@@ -644,29 +738,59 @@ function showEditCategoryModal(category) {
 // 加载网站数据
 async function loadWebsites() {
     try {
-        const tools = await toolApi.getAll();
-        const categories = await categoryApi.getAll();
+        
+        
+        // 获取网站数据响应
+        const response = await toolApi.getAll();
+        
+        
+        // 正确访问响应数据 - API包装在data字段中
+        const websites = response.data || response;
+        
+        
+        // 确保数据是数组
+        if (!Array.isArray(websites)) {
+            throw new Error('网站数据格式错误，期望数组格式');
+        }
+        
         const tbody = document.querySelector('#websites table tbody');
+        if (!tbody) {
+            throw new Error('找不到网站表格容器');
+        }
+        
         tbody.innerHTML = '';
         
-        tools.forEach(tool => {
-            const category = categories.find(c => c.id === tool.category_id);
-            const categoryName = category ? category.title : '未分类';
-            
+        // 如果没有网站数据，显示提示信息
+        if (websites.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暂无网站数据</td></tr>';
+            return;
+        }
+        
+        websites.forEach(website => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${tool.id}</td>
-                <td>${tool.name}</td>
-                <td><i class="${tool.icon}"></i></td>
-                <td>${categoryName}</td>
-                <td>${tool.description || ''}</td>
+                <td>${website.id}</td>
+                <td>${website.name}</td>
+                <td class="d-none d-lg-table-cell">${website.name_en || '-'}</td>
+                <td class="d-none d-md-table-cell"><i class="${website.icon}"></i></td>
+                <td class="d-none d-sm-table-cell">${website.category_id}</td>
+                <td class="d-none d-lg-table-cell">${website.description || '无描述'}</td>
+                <td class="d-none d-xl-table-cell">${website.description_en || '-'}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary edit-website" data-id="${tool.id}"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-danger delete-website" data-id="${tool.id}"><i class="bi bi-trash"></i></button>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-primary edit-website" data-id="${website.id}" title="编辑">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger delete-website" data-id="${website.id}" title="删除">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
         });
+        
+        
         
         // 绑定编辑和删除按钮事件
         bindWebsiteEvents();
@@ -674,10 +798,18 @@ async function loadWebsites() {
         // 更新控制面板统计数据
         const statElements = document.querySelectorAll('.stat-number');
         if (statElements.length > 1) {
-            statElements[1].textContent = tools.length;
+            statElements[1].textContent = websites.length;
         }
+        
     } catch (error) {
+        console.error('加载网站数据失败:', error);
         showAlert('加载网站数据失败: ' + error.message, 'danger');
+        
+        // 显示错误状态
+        const tbody = document.querySelector('#websites table tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">数据加载失败，请刷新页面重试</td></tr>';
+        }
     }
 }
 
@@ -687,11 +819,32 @@ function bindWebsiteEvents() {
     document.querySelectorAll('.edit-website').forEach(button => {
         button.addEventListener('click', async function() {
             const toolId = this.getAttribute('data-id');
-            const tools = await toolApi.getAll();
-            const tool = tools.find(t => t.id == toolId);
             
-            if (tool) {
-                showEditWebsiteModal(tool);
+            try {
+                // 获取网站数据响应
+                const response = await toolApi.getAll();
+                
+                
+                // 正确访问响应数据 - API包装在data字段中
+                const tools = response.data || response;
+                
+                
+                // 确保数据是数组
+                if (!Array.isArray(tools)) {
+                    throw new Error('网站数据格式错误，期望数组格式');
+                }
+                
+                // 查找指定ID的网站
+                const tool = tools.find(t => t.id == toolId);
+                
+                if (tool) {
+                    showEditWebsiteModal(tool);
+                } else {
+                    showAlert('未找到指定的网站', 'warning');
+                }
+            } catch (error) {
+                console.error('获取网站数据失败:', error);
+                showAlert('获取网站数据失败: ' + error.message, 'danger');
             }
         });
     });
@@ -715,172 +868,273 @@ function bindWebsiteEvents() {
 
 // 显示添加网站模态框
 async function showAddWebsiteModal() {
-    // 获取所有分类
-    const categories = await categoryApi.getAll();
+    try {
+        // 获取分类数据
+        const response = await categoryApi.getAll();
+        
+        // 正确访问响应数据 - API包装在data字段中
+        const categories = response.data || response;
+        
+        // 确保数据是数组
+        if (!Array.isArray(categories)) {
+            throw new Error('分类数据格式错误，期望数组格式');
+        }
     
-    // 创建模态框
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.id = 'addWebsiteModal';
-    modal.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">添加网站</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addWebsiteForm">
-                        <div class="mb-3">
-                            <label for="websiteName" class="form-label">网站名称</label>
-                            <input type="text" class="form-control" id="websiteName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="websiteDescription" class="form-label">描述</label>
-                            <textarea class="form-control" id="websiteDescription" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="websiteIcon" class="form-label">图标 (Bootstrap Icons类名)</label>
-                            <input type="text" class="form-control" id="websiteIcon" placeholder="例如: bi-link">
-                            <small class="text-muted">访问 <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a> 查看可用图标</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="websiteUrl" class="form-label">URL</label>
-                            <input type="url" class="form-control" id="websiteUrl" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="websiteCategory" class="form-label">分类</label>
-                            <select class="form-select" id="websiteCategory" required>
-                                ${categories.map(category => `<option value="${category.id}">${category.title}</option>`).join('')}
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="saveWebsiteBtn">保存</button>
+        // 创建模态框
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'addWebsiteModal';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">添加网站</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addWebsiteForm">
+                            <div class="mb-3">
+                                <label for="websiteName" class="form-label">网站名称</label>
+                                <input type="text" class="form-control" id="websiteName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteNameEn" class="form-label">网站英文名称</label>
+                                <input type="text" class="form-control" id="websiteNameEn" placeholder="请输入英文名称">
+                                <small class="text-muted">用于前台语言切换时显示</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteDescription" class="form-label">描述</label>
+                                <textarea class="form-control" id="websiteDescription" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteDescriptionEn" class="form-label">英文描述</label>
+                                <textarea class="form-control" id="websiteDescriptionEn" rows="2" placeholder="请输入英文描述"></textarea>
+                                <small class="text-muted">用于前台语言切换时显示</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteIcon" class="form-label">网站图标</label>
+                                <input type="file" class="form-control" id="websiteIcon" accept="image/*" onchange="previewIcon('websiteIcon', 'iconPreview')">
+                                <small class="text-muted">支持 PNG、JPG、SVG 等图片格式，建议尺寸 32x32 像素</small>
+                                <div id="iconPreview" class="mt-2" style="display: none;">
+                                    <img src="" alt="图标预览" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteUrl" class="form-label">URL</label>
+                                <input type="url" class="form-control" id="websiteUrl" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="websiteCategory" class="form-label">分类</label>
+                                <select class="form-select" id="websiteCategory" required>
+                                    ${categories.map(category => `<option value="${category.id}">${category.title}</option>`).join('')}
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="saveWebsiteBtn">保存</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // 显示模态框
-    const modalInstance = new bootstrap.Modal(modal);
-    modalInstance.show();
-    
-    // 绑定保存按钮事件
-    document.getElementById('saveWebsiteBtn').addEventListener('click', async function() {
-        const name = document.getElementById('websiteName').value;
-        const description = document.getElementById('websiteDescription').value;
-        const icon = document.getElementById('websiteIcon').value || 'bi-link';
-        const url = document.getElementById('websiteUrl').value;
-        const category_id = document.getElementById('websiteCategory').value;
+        `;
+        document.body.appendChild(modal);
         
-        if (!name || !url || !category_id) {
-            showAlert('请填写必填字段', 'warning');
-            return;
-        }
+        // 显示模态框
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
         
-        try {
-            await toolApi.add({ name, description, icon, url, category_id });
-            modalInstance.hide();
-            showAlert('网站添加成功', 'success');
-            loadWebsites(); // 重新加载网站数据
+        // 绑定保存按钮事件
+        document.getElementById('saveWebsiteBtn').addEventListener('click', async function() {
+            const name = document.getElementById('websiteName').value;
+            const name_en = document.getElementById('websiteNameEn').value;
+            const description = document.getElementById('websiteDescription').value;
+            const description_en = document.getElementById('websiteDescriptionEn').value;
+            const iconFile = document.getElementById('websiteIcon').files[0]; // 获取上传的文件
+            const url = document.getElementById('websiteUrl').value;
+            const category_id = document.getElementById('websiteCategory').value;
             
-            // 移除模态框
-            modal.addEventListener('hidden.bs.modal', function() {
-                document.body.removeChild(modal);
-            });
-        } catch (error) {
-            showAlert('添加网站失败: ' + error.message, 'danger');
-        }
-    });
+            if (!name || !url || !category_id) {
+                showAlert('请填写必填字段', 'warning');
+                return;
+            }
+            
+            try {
+                let iconUrl = 'Logo'; // 默认显示Logo字样
+                
+                // 如果有上传图标文件，先上传图标
+                if (iconFile) {
+                    const formData = new FormData();
+                    formData.append('file', iconFile);
+                    
+                    const uploadResponse = await fetch('/api/upload-icon', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (uploadResponse.ok) {
+                        const uploadResult = await uploadResponse.json();
+                        iconUrl = uploadResult.icon_url;
+                    } else {
+                        throw new Error('图标上传失败');
+                    }
+                }
+                
+                // 添加网站数据，包含图标URL
+                await toolApi.add({ name, name_en, description, description_en, icon: iconUrl, url, category_id });
+                modalInstance.hide();
+                showAlert('网站添加成功', 'success');
+                loadWebsites(); // 重新加载网站数据
+                
+                // 移除模态框
+                modal.addEventListener('hidden.bs.modal', function() {
+                    document.body.removeChild(modal);
+                });
+            } catch (error) {
+                showAlert('添加网站失败: ' + error.message, 'danger');
+            }
+        });
+        
+    } catch (error) {
+        console.error('获取分类数据失败:', error);
+        showAlert('获取分类数据失败: ' + error.message, 'danger');
+    }
 }
 
 // 显示编辑网站模态框
 async function showEditWebsiteModal(tool) {
-    // 获取所有分类
-    const categories = await categoryApi.getAll();
-    
-    // 创建模态框
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.id = 'editWebsiteModal';
-    modal.innerHTML = `
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">编辑网站</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editWebsiteForm">
-                        <div class="mb-3">
-                            <label for="editWebsiteName" class="form-label">网站名称</label>
-                            <input type="text" class="form-control" id="editWebsiteName" value="${tool.name}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editWebsiteDescription" class="form-label">描述</label>
-                            <textarea class="form-control" id="editWebsiteDescription" rows="2">${tool.description || ''}</textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editWebsiteIcon" class="form-label">图标 (Bootstrap Icons类名)</label>
-                            <input type="text" class="form-control" id="editWebsiteIcon" value="${tool.icon}" placeholder="例如: bi-link">
-                            <small class="text-muted">访问 <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a> 查看可用图标</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editWebsiteUrl" class="form-label">URL</label>
-                            <input type="url" class="form-control" id="editWebsiteUrl" value="${tool.url}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editWebsiteCategory" class="form-label">分类</label>
-                            <select class="form-select" id="editWebsiteCategory" required>
-                                ${categories.map(category => `<option value="${category.id}" ${category.id === tool.category_id ? 'selected' : ''}>${category.title}</option>`).join('')}
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="updateWebsiteBtn">更新</button>
+    try {
+        // 获取所有分类
+        const response = await categoryApi.getAll();
+        
+        
+        // 正确访问响应数据 - API包装在data字段中
+        const categories = response.data || response;
+        
+        
+        // 确保数据是数组
+        if (!Array.isArray(categories)) {
+            throw new Error('分类数据格式错误，期望数组格式');
+        }
+        // 创建模态框
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'editWebsiteModal';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">编辑网站</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editWebsiteForm">
+                            <div class="mb-3">
+                                <label for="editWebsiteName" class="form-label">网站名称</label>
+                                <input type="text" class="form-control" id="editWebsiteName" value="${tool.name}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteNameEn" class="form-label">网站英文名称</label>
+                                <input type="text" class="form-control" id="editWebsiteNameEn" value="${tool.name_en || ''}" placeholder="请输入英文名称">
+                                <small class="text-muted">用于前台语言切换时显示</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteDescription" class="form-label">描述</label>
+                                <textarea class="form-control" id="editWebsiteDescription" rows="2">${tool.description || ''}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteDescriptionEn" class="form-label">英文描述</label>
+                                <textarea class="form-control" id="editWebsiteDescriptionEn" rows="2" placeholder="请输入英文描述">${tool.description_en || ''}</textarea>
+                                <small class="text-muted">用于前台语言切换时显示</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteIcon" class="form-label">网站图标</label>
+                                <input type="file" class="form-control" id="editWebsiteIcon" accept="image/*" onchange="previewIcon('editWebsiteIcon', 'editIconPreview')">
+                                <small class="text-muted">支持 PNG、JPG、SVG 等图片格式，建议尺寸 32x32 像素</small>
+                                <div id="editIconPreview" class="mt-2">
+                                    ${tool.icon ? `<img src="${tool.icon}" alt="当前图标" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">` : '<span class="text-muted">Logo</span>'}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteUrl" class="form-label">URL</label>
+                                <input type="url" class="form-control" id="editWebsiteUrl" value="${tool.url}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWebsiteCategory" class="form-label">分类</label>
+                                <select class="form-select" id="editWebsiteCategory" required>
+                                    ${categories.map(category => `<option value="${category.id}" ${category.id === tool.category_id ? 'selected' : ''}>${category.title}</option>`).join('')}
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="updateWebsiteBtn">更新</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // 显示模态框
-    const modalInstance = new bootstrap.Modal(modal);
-    modalInstance.show();
-    
-    // 绑定更新按钮事件
-    document.getElementById('updateWebsiteBtn').addEventListener('click', async function() {
-        const name = document.getElementById('editWebsiteName').value;
-        const description = document.getElementById('editWebsiteDescription').value;
-        const icon = document.getElementById('editWebsiteIcon').value || 'bi-link';
-        const url = document.getElementById('editWebsiteUrl').value;
-        const category_id = document.getElementById('editWebsiteCategory').value;
+        `;
+        document.body.appendChild(modal);
         
-        if (!name || !url || !category_id) {
-            showAlert('请填写必填字段', 'warning');
-            return;
-        }
+        // 显示模态框
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
         
-        try {
-            await toolApi.update(tool.id, { name, description, icon, url, category_id });
-            modalInstance.hide();
-            showAlert('网站更新成功', 'success');
-            loadWebsites(); // 重新加载网站数据
+        // 绑定更新按钮事件
+        document.getElementById('updateWebsiteBtn').addEventListener('click', async function() {
+            const name = document.getElementById('editWebsiteName').value;
+            const name_en = document.getElementById('editWebsiteNameEn').value;
+            const description = document.getElementById('editWebsiteDescription').value;
+            const description_en = document.getElementById('editWebsiteDescriptionEn').value;
+            const iconFile = document.getElementById('editWebsiteIcon').files[0]; // 获取上传的文件
+            const url = document.getElementById('editWebsiteUrl').value;
+            const category_id = document.getElementById('editWebsiteCategory').value;
             
-            // 移除模态框
-            modal.addEventListener('hidden.bs.modal', function() {
-                document.body.removeChild(modal);
-            });
-        } catch (error) {
-            showAlert('更新网站失败: ' + error.message, 'danger');
-        }
-    });
+            if (!name || !url || !category_id) {
+                showAlert('请填写必填字段', 'warning');
+                return;
+            }
+            
+            try {
+                let iconUrl = tool.icon || 'Logo'; // 保持原有图标或默认Logo字样
+                
+                // 如果有上传图标文件，先上传图标
+                if (iconFile) {
+                    const formData = new FormData();
+                    formData.append('file', iconFile);
+                    
+                    const uploadResponse = await fetch('/api/upload-icon', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (uploadResponse.ok) {
+                        const uploadResult = await uploadResponse.json();
+                        iconUrl = uploadResult.icon_url;
+                    } else {
+                        throw new Error('图标上传失败');
+                    }
+                }
+                
+                // 更新网站数据，包含图标URL
+                await toolApi.update(tool.id, { name, name_en, description, description_en, icon: iconUrl, url, category_id });
+                modalInstance.hide();
+                showAlert('网站更新成功', 'success');
+                loadWebsites(); // 重新加载网站数据
+                
+                // 移除模态框
+                modal.addEventListener('hidden.bs.modal', function() {
+                    document.body.removeChild(modal);
+                });
+            } catch (error) {
+                showAlert('更新网站失败: ' + error.message, 'danger');
+            }
+        });
+        
+    } catch (error) {
+        console.error('获取分类数据失败:', error);
+        showAlert('获取分类数据失败: ' + error.message, 'danger');
+    }
 }
 
 // 渲染快捷导航列表

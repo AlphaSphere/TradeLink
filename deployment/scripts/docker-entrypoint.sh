@@ -29,10 +29,10 @@ print_info "运行环境: $FLASK_ENV"
 
 # 初始化数据库（如果需要）
 print_info "检查数据库状态..."
-cd /app/serve
+cd /app/backend/api
 python -c "
 import sys
-sys.path.append('/app/serve')
+sys.path.append('/app/backend/api')
 from app import init_db
 try:
     init_db()
@@ -75,8 +75,32 @@ done
 
 # 启动前端服务
 print_info "启动前端HTTP服务..."
-cd /app
-python -m http.server 8000 &
+cd /app/frontend
+# 创建一个临时的Python HTTP服务器脚本，实现根目录重定向
+cat > temp_server.py << 'EOF'
+import http.server
+import socketserver
+from urllib.parse import urlparse
+import os
+
+class RedirectHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # 如果访问根目录，重定向到 /pages/index.html
+        if self.path == '/' or self.path == '':
+            self.send_response(302)
+            self.send_header('Location', '/pages/index.html')
+            self.end_headers()
+            return
+        # 其他请求正常处理
+        super().do_GET()
+
+PORT = 8000
+with socketserver.TCPServer(("", PORT), RedirectHandler) as httpd:
+    print(f"Server running at http://localhost:{PORT}")
+    httpd.serve_forever()
+EOF
+
+python temp_server.py &
 FRONTEND_PID=$!
 print_info "前端服务PID: $FRONTEND_PID"
 

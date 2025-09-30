@@ -18,25 +18,25 @@ body {
     overflow-x: hidden;
 }
 
-/* 容器居中样式 - 桌面端左右留白480px */
+/* 容器居中样式 - 左右留白10% */
 .container {
-    max-width: calc(100vw - 960px); /* 左右各留白480px */
+    max-width: 80%; /* 左右各留白10%，中间内容占80% */
     margin: 0 auto;
     padding: 0 15px;
     width: 100%; /* 确保容器宽度自适应 */
 }
 
-/* 大屏幕保持480px留白 */
+/* 大屏幕保持10%留白 */
 @media (min-width: 1400px) {
     .container {
-        max-width: calc(100vw - 960px); /* 保持左右各留白480px */
+        max-width: 80%; /* 保持左右各留白10% */
     }
 }
 
 /* 中等屏幕优化 - 减少留白 */
 @media (max-width: 1199px) {
     .container {
-        max-width: calc(100vw - 200px); /* 左右各留白100px */
+        max-width: 70%; /* 左右各留白15% */
         padding: 0 20px;
     }
 }
@@ -64,6 +64,73 @@ body {
     /* 确保导航栏在移动端不会被遮挡 */
     position: relative;
     z-index: 1030;
+    display: flex;
+    /* 移除居中显示 */
+    width: 100%; /* 确保宽度适配 */
+}
+
+/* 头部导航容器 - 左右留白10% */
+.container-navbar {
+    width: 80%; /* 左右各留白10%，中间内容占80% */
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* 大屏幕保持10%留白 */
+@media (min-width: 1400px) {
+    .container-navbar {
+        width: 80%; /* 保持左右各留白10% */
+    }
+}
+
+/* 中等屏幕优化 - 减少留白 */
+@media (max-width: 1199px) {
+    .container-navbar {
+        width: 70%; /* 左右各留白15% */
+    }
+}
+
+/* 平板端容器优化 */
+@media (max-width: 768px) {
+    .container-navbar {
+        width: 90%;
+    }
+}
+
+/* 移动端容器优化 */
+@media (max-width: 480px) {
+    .container-navbar {
+        width: 100%;
+    }
+}
+
+/* 确保导航菜单项在一行内显示且完全可见，支持左右滚动 */
+.navbar-nav {
+    display: flex;
+    flex-direction: row; /* 强制横向排列 */
+    flex-wrap: nowrap; /* 禁止换行 */
+    overflow-x: auto; /* 内容过多时允许横向滚动 */
+    white-space: nowrap; /* 文本不换行 */
+    -webkit-overflow-scrolling: touch; /* 平滑滚动 */
+    scrollbar-width: none; /* 隐藏滚动条 - Firefox */
+    -ms-overflow-style: none; /* 隐藏滚动条 - IE/Edge */
+    width: auto; /* 改为自适应宽度，不占满全宽 */
+    padding: 0; /* 移除内边距 */
+    margin-left: 0; /* 左对齐 */
+    flex: 1; /* 占据剩余空间 */
+    min-width: 0; /* 允许容器缩小到比内容更小 */
+}
+
+/* 隐藏WebKit浏览器的滚动条 */
+.navbar-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* 确保导航项目完全显示 */
+.navbar-nav .nav-item {
+    flex-shrink: 0; /* 防止项目被压缩 */
+    display: flex; /* 使用flex布局 */
+    align-items: center; /* 垂直居中 */
 }
 
 /* 导航栏响应式优化 */
@@ -73,10 +140,25 @@ body {
     }
     
     .navbar-collapse {
-        margin-top: 0.5rem;
-        padding-top: 0.5rem;
-        border-top: 1px solid var(--border-color);
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
     }
+}
+
+/* 确保logo和菜单在同一行，支持左右滚动 */
+.navbar-collapse {
+    display: flex !important; /* 强制显示，防止Bootstrap默认行为 */
+    flex-direction: row !important;
+    align-items: center !important; /* 垂直居中对齐 */
+    overflow-x: auto !important; /* 允许横向滚动 */
+    flex: 1 !important; /* 占据剩余空间 */
+    min-width: 0 !important; /* 允许容器缩小 */
+    -webkit-overflow-scrolling: touch !important; /* 平滑滚动 */
+    scrollbar-width: none !important; /* 隐藏滚动条 - Firefox */
+    -ms-overflow-style: none !important; /* 隐藏滚动条 - IE/Edge */
+    justify-content: flex-start !important;
+    margin-left: 20px !important; /* 与logo保持一定距离 */
 }
 
 @media (max-width: 576px) {
@@ -420,8 +502,8 @@ body {
 /* 网站分类项目样式 - 移动端优化 */
 .card-container, .website-cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 使用auto-fill和minmax让卡片自适应填满容器 */
+    gap: 8px; /* 卡片之间间隔8px，更紧凑的布局 */
     list-style: none;
     padding: 0;
     margin-bottom: 10px;
@@ -436,22 +518,22 @@ body {
 /* 响应式卡片布局优化 */
 @media (max-width: 1200px) {
     .card-container, .website-cards {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 使用auto-fill和minmax让卡片自适应填满容器 */
+        gap: 6px; /* 卡片之间间隔6px，更紧凑的布局 */
     }
 }
 
 @media (max-width: 768px) {
     .card-container, .website-cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 使用auto-fill和minmax让卡片自适应填满容器 */
+        gap: 5px; /* 卡片之间间隔5px，更紧凑的布局 */
     }
 }
 
 @media (max-width: 480px) {
     .card-container, .website-cards {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: 1fr; /* 手机端保持单列布局 */
+        gap: 4px; /* 卡片之间间隔4px，更紧凑的布局 */
     }
 }
 
@@ -464,7 +546,7 @@ body {
     display: inline-block;
     width: auto;
     min-width: 150px; /* 调整为150px宽度 */
-    max-width: 150px; /* 固定最大宽度为150px */
+    max-width: 230px; /* 固定最大宽度为150px */
 }
 
 @media (max-width: 768px) {
@@ -472,9 +554,9 @@ body {
     .category-section .col-md-3,
     .category-section .col-md-4 {
         min-width: 120px;
-        max-width: 120px;
+        max-width: 230px;
         padding: 0 8px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 }
 
@@ -495,7 +577,7 @@ body {
     margin-bottom: 15px;
     margin-right: 15px;
     text-decoration: none;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border-radius: 8px;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -527,7 +609,7 @@ body {
 }
 
 .category-section a:hover {
-    background-color: #f0f0f0;
+    background-color: #ffffff;;
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
@@ -539,108 +621,132 @@ body {
     }
 }
 
-/* 网站卡片移动端优化 */
+/* 网站卡片样式 - 新的左右布局设计 */
 .website-card {
-    padding: 10px 16px;
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: none;
-    text-decoration: none;
-    color: #333;
-    transition: all 0.2s;
-    height: 100%;
-    border: 1px solid #f0f0f0;
+    background-color: #ffffff; /* 统一使用#ffffff背景色 */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    /* 移除height: 100%以允许内容自然展开 */
 }
 
-@media (max-width: 768px) {
-    .website-card {
-        padding: 8px 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .website-card {
-        padding: 10px 12px;
-    }
-}
-
-.website-card:hover {
+.website-card:hover,
+.website-card.clickable:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-@media (max-width: 480px) {
-    .website-card:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    }
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
 }
 
 .website-card-content {
     display: flex;
     align-items: center;
-    gap: 10px;
+    padding: 16px;
+    /* 移除height: 100%以允许内容自然展开 */
 }
 
-@media (max-width: 480px) {
-    .website-card-content {
-        gap: 8px;
-    }
-}
-
-.website-icon {
-    width: 32px;
-    height: 32px;
+/* Logo容器样式 */
+.website-logo {
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-right: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
 }
 
-@media (max-width: 480px) {
-    .website-icon {
-        width: 28px;
-        height: 28px;
-    }
+.card-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
 }
 
-.website-icon img {
-    max-width: 100%;
-    border-radius: 6px;
-}
-
+/* 网站信息容器 */
 .website-info {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
 }
 
+/* 网站名称样式 */
 .website-name {
     font-size: 14px;
-    font-weight: 500;
-    margin: 0;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #212529;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-@media (max-width: 480px) {
+/* 网站描述样式 */
+.website-desc {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 移动端响应式样式 */
+@media (max-width: 768px) {
+    .website-card-content {
+        padding: 12px;
+    }
+    
+    .website-logo {
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+    }
+    
+    .card-logo {
+        width: 28px;
+        height: 28px;
+    }
+    
     .website-name {
         font-size: 13px;
     }
-}
-
-.website-desc {
-    font-size: 12px;
-    color: var(--secondary-color);
-    margin: 2px 0 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    
+    .website-desc {
+        font-size: 11px;
+        -webkit-line-clamp: 1;
+    }
 }
 
 @media (max-width: 480px) {
+    .website-card-content {
+        padding: 10px;
+    }
+    
+    .website-logo {
+        width: 36px;
+        height: 36px;
+        margin-right: 10px;
+    }
+    
+    .card-logo {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .website-name {
+        font-size: 12px;
+    }
+    
     .website-desc {
-        font-size: 11px;
+        font-size: 10px;
     }
 }
 
@@ -680,18 +786,22 @@ body {
 /* 快捷导航区域 */
 .quick-nav {
     margin-bottom: 1.5rem;
+    background-color: #ffffff; /* 添加背景色 */
+    border-radius: 8px; /* 添加圆角 */
+    padding: 15px 20px; /* 增加内边距 */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
 }
 
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
+.quick-nav-title {
+    font-size: 16px;
+    font-weight: 600;
     margin-bottom: 15px;
     color: var(--dark-color);
     display: flex;
     align-items: center;
 }
 
-.section-title i {
+.quick-nav-title i {
     margin-right: 8px;
     color: var(--primary-color);
 }
@@ -699,27 +809,43 @@ body {
 .nav-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    flex-direction: row; /* 确保横向排列 */
+    gap: 15px;              /* 增加按钮之间的间距 */
+    flex-direction: row;    /* 确保横向排列 */
     justify-content: flex-start; /* 从左到右排列 */
-    overflow-x: auto; /* 内容过多时允许横向滚动 */
-    padding-bottom: 10px; /* 为滚动条留出空间 */
+    overflow-x: auto;       /* 内容过多时允许横向滚动 */
+    padding: 15px 0;        /* 增加上下内边距，让按钮不那么挤 */
+    scrollbar-width: none;  /* 隐藏滚动条 - Firefox */
+    -ms-overflow-style: none; /* 隐藏滚动条 - IE/Edge */
+    margin-top: 5px;        /* 与标题保持一定距离 */
 }
 
+/* 隐藏WebKit浏览器的滚动条 */
+.nav-buttons::-webkit-scrollbar {
+    display: none;
+}
+
+/* 快捷导航按钮样式 - 应用用户指定的字体属性 */
 .nav-btn {
     background-color: white;
     border: 1px solid var(--border-color);
     border-radius: 20px;
-    padding: 6px 15px;
-    font-size: 14px;
+    padding: 8px 18px;      /* 增加内边距，让按钮更大更易点击 */
+    font-size: 13px;        /* 用户指定字体大小 */
+    font-weight: 400;       /* 减轻字体粗细，看起来更协调 */
+    line-height: 18px;      /* 用户指定行高 */
+    white-space: nowrap;    /* 防止换行 */
+    overflow: hidden;       /* 隐藏溢出 */
+    text-overflow: ellipsis; /* 省略号显示 */
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* 增强阴影效果 */
 }
 
 .nav-btn:hover, .nav-btn.active {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.3); /* 增强悬停时的阴影效果 */
 }
 
 /* 网站卡片样式 */
@@ -757,6 +883,7 @@ body {
     display: inline-block; /* 使列表项横向排列 */
     margin-right: 10px; /* 列表项之间的间距 */
     margin-bottom: 10px; /* 行之间的间距 */
+    max-width: 207px; /* 设置li元素最大宽度为207px */
 }
 
 .country-link:hover, .platform-link:hover {
@@ -785,16 +912,19 @@ body {
 
 /* 网站分类区域 */
 .website-categories {
-    margin-bottom: 2rem;
+    margin-bottom: 1.2rem; /* 减少整体分类区域的底部间距 */
 }
 
 .category-section {
-    margin-bottom: 20px;
+    margin-bottom: 8px; /* 进一步减少分类区块间距，从12px调整为8px */
     background-color: #fff;
     border-radius: 8px;
     padding: 15px;
     box-shadow: none;
     border: 1px solid #f0f0f0;
+    width: 100%; /* 确保分类容器宽度100% */
+    box-sizing: border-box; /* 添加box-sizing属性 */
+    overflow: visible; /* 确保不会隐藏内容 */
 }
 
 .section-title {
@@ -861,7 +991,7 @@ body {
     display: inline-block;
     width: auto;
     min-width: 150px; /* 调整为150px宽度 */
-    max-width: 150px; /* 固定最大宽度为150px */
+    max-width: 230px; /* 固定最大宽度为230px */
 }
 
 @media (max-width: 768px) {
@@ -869,7 +999,7 @@ body {
     .category-section .col-md-3,
     .category-section .col-md-4 {
         min-width: 120px;
-        max-width: 120px;
+        max-width: 230px;
         padding: 0 8px;
         margin-bottom: 15px;
     }
@@ -945,7 +1075,7 @@ body {
     text-decoration: none;
     color: #333;
     transition: all 0.2s;
-    height: 100%;
+    /* 移除height: 100%以允许内容自然展开 */
     border: 1px solid #f0f0f0;
 }
 
@@ -1011,13 +1141,15 @@ body {
     min-width: 0;
 }
 
+/* 网站名称样式 - 中等屏幕尺寸 */
 .website-name {
-    font-size: 14px;
-    font-weight: 500;
-    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin: 0;
 }
 
 @media (max-width: 480px) {
@@ -1093,31 +1225,7 @@ body {
     color: var(--primary-color);
 }
 
-.nav-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    flex-direction: row; /* 确保横向排列 */
-    justify-content: flex-start; /* 从左到右排列 */
-    overflow-x: auto; /* 内容过多时允许横向滚动 */
-    padding-bottom: 10px; /* 为滚动条留出空间 */
-}
-
-.nav-btn {
-    background-color: white;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 6px 15px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.nav-btn:hover, .nav-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
+/* 导航按钮样式已移至全局定义，此处删除重复代码 */
 
 /* 网站卡片样式 */
 .site-card {
@@ -1182,11 +1290,11 @@ body {
 
 /* 网站分类区域 */
 .website-categories {
-    margin-bottom: 2rem;
+    margin-bottom: 1.2rem; /* 减少整体分类区域的底部间距，保持一致性 */
 }
 
 .category-section {
-    margin-bottom: 20px;
+    margin-bottom: 8px; /* 进一步减少分类区块间距，保持一致性 */
     background-color: #fff;
     border-radius: 8px;
     padding: 15px;
@@ -1266,7 +1374,7 @@ body {
     .category-section .col-md-3,
     .category-section .col-md-4 {
         min-width: 120px;
-        max-width: 120px;
+        max-width: 230px;
         padding: 0 8px;
         margin-bottom: 15px;
     }
@@ -1289,7 +1397,7 @@ body {
     margin-bottom: 15px;
     margin-right: 15px;
     text-decoration: none;
-    background-color: #f9f9f9;
+    background-color: #ffffff;;
     border-radius: 8px;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -1408,9 +1516,11 @@ body {
     min-width: 0;
 }
 
+/* 网站名称样式 - 大屏幕尺寸 */
 .website-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
+    line-height: 18px;
     color: rgb(68, 68, 68);
     margin-bottom: 4px;
     white-space: nowrap;
@@ -1487,6 +1597,7 @@ body {
 
 .footer-links li {
     margin-bottom: 8px;
+    max-width: 207px; /* 设置li元素最大宽度为207px */
 }
 
 .footer-links a {
@@ -1708,13 +1819,12 @@ body {
         padding: 5px 10px;
     }
     
+        /* 导航按钮样式已移至全局定义，此处仅保留小屏幕特有的响应式调整 */
     .nav-buttons {
-        flex-wrap: wrap;
         gap: 5px;
     }
     
     .nav-btn {
-        font-size: 12px;
         padding: 5px 10px;
     }
     
@@ -1777,160 +1887,288 @@ body {
     font-weight: 600;
 }
 
-/* 工具分类容器样式 */
+/* 工具分类容器样式 - 自适应布局设计，使用ul元素 */
 .tools-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(calc(20% - 8px), 1fr)); /* 一行最多5个li，按比例划分 */
+    gap: 10px; /* 桌面端：li之间的间距设置为10px */
+    margin-top: 15px;
     padding: 0;
+    width: 100%; /* 确保容器宽度100% */
+    box-sizing: border-box; /* 添加box-sizing属性 */
+    list-style: none; /* 移除ul默认样式 */
+    justify-content: start; /* 左对齐 */
 }
 
-/* 工具卡片样式 */
+/* 工具卡片列表项样式 */
+.tool-card-item {
+    margin: 0; /* 重置li默认margin */
+    padding: 0; /* 重置li默认padding */
+    list-style: none; /* 移除li默认样式 */
+    width: 100%; /* 确保li元素占满网格单元 */
+    max-width: 207px; /* 设置li元素最大宽度为207px */
+    min-width: 0; /* 防止内容溢出 */
+    height: auto; /* 自动高度 */
+    max-height: 80px; /* 设置li最大高度为80px */
+}
+
+/* 工具卡片样式 - 优化布局设计 */
 .tool-card {
-    background: white;
-    border: 1px solid #e9ecef;
+    background: #ffffff;
+    border: 1px solid #e8e9ea;
     border-radius: 8px;
     padding: 0;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+    width: 100%; /* 自适应网格宽度 */
+    height: 100%; /* 让div铺满整个li */
+    max-height: 80px; /* 设置最大高度为80px */
+    min-height: 60px; /* 调整最小高度 */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* 添加box-sizing属性 */
+    margin: 0; /* 重置margin，使用grid gap控制间距 */
 }
 
 .tool-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    border-color: var(--primary-color);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border-color: #c9d1d9;
 }
 
 .tool-card a {
-    display: block;
-    padding: 20px;
+    display: flex;
+    flex-direction: row; /* 改为水平布局，图标在左侧 */
+    align-items: flex-start; /* 顶部对齐，让图标跨行显示 */
+    padding: 8px 12px; /* 保持内边距以确保内容不贴边 */
     text-decoration: none;
-    color: inherit;
-    height: 100%;
+    /* color: inherit; 移除颜色继承 */
+    width: 100%; /* 确保a标签宽度占满整个div */
+    height: 100%; /* 确保a标签高度占满整个div */
+    box-sizing: border-box; /* 包含padding在内的盒模型 */
+    gap: 8px; /* 图标与文字内容之间的间距 */
+    margin: 0; /* 确保没有外边距 */
+    position: absolute; /* 使用绝对定位完全覆盖父容器 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .tool-card a:hover {
     text-decoration: none;
-    color: inherit;
+    /* color: inherit; 移除悬停时的颜色继承 */
 }
 
-/* 工具图标样式 */
+/* 工具图标样式 - 跨两行设计 */
 .tool-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--primary-color), #0056b3);
-    border-radius: 12px;
+    width: 40px; /* 设置为40px宽度 */
+    height: 40px; /* 设置为40px高度 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px; /* 稍微增加圆角 */
     display: flex;
-    align-items: center;
+    align-items: center; /* 垂直居中对齐 */
     justify-content: center;
-    margin-bottom: 15px;
-    color: white;
-    font-size: 24px;
+    color: #ffffff;
+    font-size: 16px; /* 增加图标字体大小以匹配40x40尺寸 */
+    flex-shrink: 0; /* 防止图标被压缩 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* 增强阴影效果 */
+    margin-right: 2px; /* 与文字内容保持适当间距 */
 }
 
-/* 工具信息样式 */
+/* 工具信息样式 - 超紧凑两行布局 */
 .tool-info {
     flex: 1;
+    width: 100%;
+}
+
+/* 第一行：logo和名称 */
+.tool-header {
+    display: flex;
+    align-items: center;
+    gap: 0px; /* 移除间距，因为图标现在在外层 */
+    margin-bottom: 2px;
 }
 
 .tool-name {
-    font-size: 16px;
+    font-size: 14px; /* 网站名称使用14像素字号 */
     font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-    line-height: 1.3;
-}
-
-.tool-desc {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.4;
-    margin-bottom: 0;
+    color: #24292e;
+    line-height: 1.4; /* 增加行间距提升可读性 */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+    flex: 1;
 }
 
-/* 分类标题样式 */
+/* 第二行：描述 */
+.tool-desc {
+    font-size: 12px; /* 网站介绍使用12像素字号 */
+    color: #6a737d;
+    line-height: 1.4; /* 增加行间距提升可读性 */
+    margin-bottom: 0;
+    margin-left: 0px; /* 移除左边距，因为图标现在在外层 */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    text-align: left;
+}
+
+/* 分类标题样式 - 优化设计 */
 .category-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    color: var(--dark-color);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9ecef;
+    color: #24292e;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e1e4e8;
     display: flex;
     align-items: center;
 }
 
 .category-title i {
-    margin-right: 10px;
-    color: var(--primary-color);
-    font-size: 22px;
+    margin-right: 8px;
+    color: #586069;
+    font-size: 18px;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 优化卡片布局显示 */
 @media (max-width: 1200px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(calc(20% - 8px), 1fr)); /* 中等屏幕：一行最多5个li，按比例划分 */
+        gap: 8px; /* 中等屏幕：li之间的间距设置为8px */
+        justify-content: start; /* 左对齐 */
+    }
+    
+    .tool-card {
+        width: 100%;
+        height: 100%; /* 让div铺满整个li */
+        max-height: 80px; /* 设置最大高度为80px */
+        min-height: 60px; /* 调整最小高度 */
+    }
+    
+    .tool-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+    }
+    
+    .tool-name {
+        font-size: 14px; /* 中等屏幕：网站名称保持14像素字号 */
+    }
+    
+    .tool-desc {
+        font-size: 12px; /* 中等屏幕：网站介绍保持12像素字号 */
+        margin-left: 0px; /* 中等屏幕：移除左边距，因为图标现在在外层 */
     }
 }
 
 @media (max-width: 768px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(calc(25% - 6px), 1fr)); /* 平板屏幕：一行最多4个li，按比例划分 */
+        gap: 8px; /* 平板屏幕：li之间的间距设置为8px */
+        justify-content: start; /* 左对齐 */
+    }
+    
+    .tool-card {
+        width: 100%;
+        height: 100%; /* 让div铺满整个li */
+        max-height: 80px; /* 设置最大高度为80px */
+        min-height: 60px; /* 调整最小高度 */
     }
     
     .tool-card a {
-        padding: 15px;
+        flex-direction: row; /* 平板屏幕：保持水平布局 */
+        align-items: flex-start; /* 平板屏幕：顶部对齐 */
+        padding: 8px 10px;
+        gap: 6px; /* 平板屏幕：图标与文字内容之间的间距 */
     }
     
     .tool-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        margin-bottom: 12px;
+        width: 36px; /* 平板端：调整为36px */
+        height: 36px; /* 平板端：调整为36px */
+        font-size: 15px; /* 平板端：调整图标字体大小 */
+        border-radius: 5px; /* 平板端：适当的圆角 */
+        margin-right: 2px; /* 平板端：与文字内容保持间距 */
     }
     
     .tool-name {
-        font-size: 15px;
+        font-size: 13px; /* 平板屏幕：网站名称适当缩小为13像素 */
+        margin-bottom: 2px;
+        line-height: 1.3; /* 平板屏幕：适当的行间距 */
     }
     
     .tool-desc {
-        font-size: 13px;
+        font-size: 11px; /* 平板屏幕：网站介绍适当缩小为11像素 */
+        line-height: 1.3; /* 平板屏幕：适当的行间距 */
+        margin-left: 0px; /* 平板屏幕：移除左边距，因为图标现在在外层 */
+    }
+    
+    .category-title {
+        font-size: 16px;
+        margin-bottom: 12px;
     }
 }
 
 @media (max-width: 480px) {
     .tools-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(calc(33.33% - 6px), 1fr)); /* 移动端：一行最多3个li，按比例划分 */
+        gap: 8px; /* 移动端：li之间的间距设置为8px */
+        justify-content: start; /* 左对齐 */
+    }
+    
+    .tool-card {
+        width: 100%;
+        height: 100%; /* 让div铺满整个li */
+        max-height: 80px; /* 设置最大高度为80px */
+        min-height: 60px; /* 调整最小高度 */
     }
     
     .tool-card a {
-        padding: 12px;
+        flex-direction: row; /* 移动端：保持水平布局 */
+        align-items: flex-start; /* 移动端：顶部对齐 */
+        padding: 8px;
+        gap: 6px; /* 移动端：图标与文字内容之间的间距 */
     }
     
     .tool-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-        margin-bottom: 10px;
+        width: 32px; /* 移动端：调整为32px */
+        height: 32px; /* 移动端：调整为32px */
+        font-size: 14px; /* 移动端：调整图标字体大小 */
+        border-radius: 4px; /* 移动端：适当的圆角 */
+        margin-right: 2px; /* 移动端：与文字内容保持间距 */
     }
     
     .tool-name {
-        font-size: 14px;
-        margin-bottom: 6px;
+        font-size: 12px; /* 移动端：网站名称适当缩小为12像素，保持可读性 */
+        margin-bottom: 2px;
+        line-height: 1.3; /* 移动端：适当的行间距 */
     }
     
     .tool-desc {
-        font-size: 12px;
-        -webkit-line-clamp: 1;
+        font-size: 10px; /* 移动端：网站介绍适当缩小为10像素，保持可读性 */
+        line-height: 1.3; /* 移动端：适当的行间距 */
+        margin-left: 0px; /* 移动端：移除左边距，因为图标现在在外层 */
+    }
+    
+    .category-title {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 360px) {
+    .tools-container {
+        grid-template-columns: repeat(auto-fit, minmax(calc(50% - 4px), 1fr)); /* 超小屏幕：一行最多2个li，按比例划分 */
+        gap: 6px; /* 超小屏幕：li之间的间距设置为6px */
+        justify-content: start; /* 左对齐 */
     }
 }
 
@@ -1982,7 +2220,7 @@ body {
     background: transparent; /* 移除白色背景，改为透明 */
     box-shadow: none; /* 移除阴影效果 */
     width: 100%;
-    max-width: 90px; /* 减少最大宽度 */
+    max-width: 207px; /* 设置最大宽度为207px */
 }
 
 .circular-nav-item:hover {
@@ -1992,10 +2230,10 @@ body {
     text-decoration: none;
 }
 
-/* 圆形图标容器 - 调整为30×30 */
+/* 圆形图标容器 - 调整为35×35 */
 .circular-nav-icon {
-    width: 30px; /* 从26px调整为30px */
-    height: 30px; /* 从26px调整为30px */
+    width: 35px; /* 从30px调整为35px */
+    height: 35px; /* 从30px调整为35px */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2012,16 +2250,16 @@ body {
     transform: scale(1.05); /* 减少悬停缩放 */
 }
 
-/* 图标内的图片或图标 - 适配30×30容器 */
+/* 图标内的图片或图标 - 适配35×35容器 */
 .circular-nav-icon img {
-    width: 20px; /* 从16px调整为20px，适配30×30容器 */
-    height: 20px; /* 从16px调整为20px，适配30×30容器 */
+    width: 24px; /* 从20px调整为24px，适配35×35容器 */
+    height: 24px; /* 从20px调整为24px，适配35×35容器 */
     border-radius: 50%;
     object-fit: cover;
 }
 
 .circular-nav-icon i {
-    font-size: 0.9rem; /* 从0.75rem调整为0.9rem，适配30×30容器 */
+    font-size: 1.1rem; /* 从0.9rem调整为1.1rem，适配35×35容器 */
     color: white;
 }
 
@@ -2036,30 +2274,30 @@ body {
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8); /* 添加轻微的白色文字阴影 */
 }
 
-/* 响应式设计 - 适配26×26基础尺寸 */
+/* 响应式设计 - 适配35×35基础尺寸 */
 @media (max-width: 768px) {
     .circular-nav-list {
-        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); /* 适配30px图标，增加容器宽度 */
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); /* 适配35px图标，增加容器宽度 */
         gap: 0.7rem; /* 稍微增加间距 */
     }
     
     .circular-nav-item {
-        max-width: 75px; /* 适配30px图标，增加最大宽度 */
+        max-width: 85px; /* 适配35px图标，增加最大宽度 */
         padding: 0.6rem; /* 稍微增加内边距 */
     }
     
     .circular-nav-icon {
-        width: 28px; /* 平板设备适配30px基础尺寸 */
-        height: 28px;
+        width: 32px; /* 平板设备适配35px基础尺寸 */
+        height: 32px;
     }
     
     .circular-nav-icon img {
-        width: 18px; /* 相应调整图片大小，保持约64%填充比例 */
-        height: 18px;
+        width: 22px; /* 相应调整图片大小，保持约69%填充比例 */
+        height: 22px;
     }
     
     .circular-nav-icon i {
-        font-size: 0.85rem; /* 相应调整字体图标大小 */
+        font-size: 1.0rem; /* 相应调整字体图标大小 */
     }
     
     .circular-nav-name {
@@ -2069,27 +2307,27 @@ body {
 
 @media (max-width: 480px) {
     .circular-nav-list {
-        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); /* 手机端适配30px图标 */
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); /* 手机端适配35px图标 */
         gap: 0.6rem; /* 适当间距 */
     }
     
     .circular-nav-item {
-        max-width: 65px; /* 手机端适配30px图标 */
+        max-width: 75px; /* 手机端适配35px图标 */
         padding: 0.5rem;
     }
     
     .circular-nav-icon {
-        width: 26px; /* 手机端适配30px基础尺寸 */
-        height: 26px;
+        width: 30px; /* 手机端适配35px基础尺寸 */
+        height: 30px;
     }
     
     .circular-nav-icon img {
-        width: 16px; /* 手机端图片大小，保持约62%填充比例 */
-        height: 16px;
+        width: 20px; /* 手机端图片大小，保持约67%填充比例 */
+        height: 20px;
     }
     
     .circular-nav-icon i {
-        font-size: 0.8rem; /* 手机端字体图标大小 */
+        font-size: 0.9rem; /* 手机端字体图标大小 */
     }
     
     .circular-nav-name {
@@ -2171,43 +2409,22 @@ body {
         border-color: var(--primary-color);
     }
     
-    /* 导航按钮移动端优化 */
+    /* 导航按钮移动端优化 - 仅保留移动端特有的样式调整 */
     .nav-buttons {
-        display: flex;
-        overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
         padding: 10px 0;
         gap: 8px;
-    }
-    
-    .nav-buttons::-webkit-scrollbar {
-        display: none;
     }
     
     .nav-btn {
         flex-shrink: 0;
         padding: 8px 16px;
-        background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 20px;
-        font-size: 14px;
-        white-space: nowrap;
-        transition: all 0.2s ease;
-    }
-    
-    .nav-btn:hover,
-    .nav-btn:active {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
     }
     
     /* 卡片网格移动端优化 */
     .website-cards {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
         padding: 0 20px;
     }
     
@@ -2223,6 +2440,42 @@ body {
     .website-card:active {
         transform: scale(0.98);
         background: #f8f9fa;
+    }
+    
+    /* 工具分类容器移动端优化 */
+    .tools-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px; /* 保持8px间距 */
+    }
+    
+    /* 工具卡片移动端优化 */
+    .tool-card {
+        width: 100%;
+        height: 70px;
+    }
+    
+    .tool-card a {
+        padding: 6px 10px;
+        gap: 3px;
+    }
+    
+    .tool-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+    
+    .tool-header {
+        gap: 4px;
+        margin-bottom: 1px;
+    }
+    
+    .tool-name {
+        font-size: 11px;
+    }
+    
+    .tool-desc {
+        font-size: 9px;
     }
     
     /* 侧边栏移动端优化 */
@@ -2370,6 +2623,41 @@ body {
         font-size: 14px;
     }
     
+    /* 工具分类容器超小屏幕优化 */
+    .tools-container {
+        grid-template-columns: 1fr; /* 超小屏幕保持单列布局 */
+        gap: 4px; /* 超小屏幕使用4px间距，更紧凑 */
+    }
+    
+    /* 工具卡片超小屏幕优化 */
+    .tool-card {
+        height: 65px; /* 相应增加高度 */
+    }
+    
+    .tool-card a {
+        padding: 5px 8px;
+        gap: 2px;
+    }
+    
+    .tool-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+    }
+    
+    .tool-header {
+        gap: 3px;
+        margin-bottom: 1px;
+    }
+    
+    .tool-name {
+        font-size: 10px;
+    }
+    
+    .tool-desc {
+        font-size: 8px;
+    }
+    
     .website-desc {
         font-size: 12px;
     }
@@ -2444,15 +2732,7 @@ body {
         transform: scale(0.98);
     }
     
-    .nav-btn:hover {
-        background: white;
-        color: inherit;
-    }
-    
-    .nav-btn:active {
-        background: var(--primary-color);
-        color: white;
-    }
+    /* 导航按钮悬停和激活样式已移至全局定义 */
     
     .search-tab:hover {
         background: #f8f9fa;

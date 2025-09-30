@@ -3,18 +3,21 @@
 <div class="website-card-component">
     <!-- 网站卡片模板 -->
     <template id="website-card-template">
-        <li class="website-card">
-            <div class="website-card-content">
-                <div class="website-icon">
-                    <img src="" alt="网站图标" class="card-icon">
-                </div>
-                <div class="website-info">
-                    <div class="website-name text-truncate"></div>
-                    <div class="website-desc d-none d-sm-block"></div>
-                    <div class="website-desc d-sm-none text-truncate"></div>
+        <div class="col-md-4 col-sm-6 col-12 mb-3">
+            <div class="website-card h-100">
+                <div class="website-card-content d-flex align-items-center p-3">
+                    <!-- 左侧Logo -->
+                    <div class="website-logo me-3 flex-shrink-0">
+                        <img src="" alt="网站图标" class="card-logo">
+                    </div>
+                    <!-- 右侧内容 -->
+                    <div class="website-info flex-grow-1 min-width-0">
+                        <div class="website-name fw-bold mb-1 text-truncate"></div>
+                        <div class="website-desc text-muted small"></div>
+                    </div>
                 </div>
             </div>
-        </li>
+        </div>
     </template>
 
     <!-- 分类区域模板 -->
@@ -28,7 +31,7 @@
                     查看更多 <i class="bi bi-chevron-right"></i>
                 </a>
             </header>
-            <ul class="card-container row g-2 g-md-3"></ul>
+            <div class="card-container row g-2 g-md-3"></div>
         </section>
     </template>
 
@@ -49,11 +52,11 @@
 
 <!-- 卡片组件的JavaScript -->
 <script>
-    console.log('卡片组件已加载');
     
-    // 创建网站卡片的函数
-    window.createWebsiteCard = function(name, description, iconUrl, link = "#", columnClass = "col-md-4") {
-        console.log('创建网站卡片:', name, '描述:', description, '图标URL:', iconUrl);
+    
+    // 立即定义函数，不等待DOM加载
+    function createWebsiteCard(name, description, iconUrl, link = "#", columnClass = "col-md-4") {
+        
         
         // 克隆网站卡片模板
         const template = document.getElementById('website-card-template');
@@ -65,48 +68,46 @@
         const card = template.content.cloneNode(true);
         
         // 设置卡片内容
-        const nameElements = card.querySelectorAll('.website-name');
-        const descElements = card.querySelectorAll('.website-desc');
-        const iconElement = card.querySelector('.card-icon');
-        const linkElement = card.querySelector('.card-link');
+        const nameElement = card.querySelector('.website-name');
+        const descElement = card.querySelector('.website-desc');
+        const logoElement = card.querySelector('.card-logo');
+        const cardElement = card.querySelector('.website-card');
         
-        // 设置网站名称（可能有多个元素用于响应式显示）
-        nameElements.forEach(element => {
-            element.textContent = name;
-        });
-        
-        // 设置网站描述（可能有多个元素用于响应式显示）
-        descElements.forEach(element => {
-            element.textContent = description;
-        });
-        
-        // 设置图标
-        if (iconElement) {
-            iconElement.src = iconUrl || 'https://placehold.co/50x50';
-            iconElement.alt = name;
-            iconElement.onerror = function() {
-                console.warn('网站图标加载失败，使用备用图标:', iconUrl);
-                this.src = 'https://placehold.co/50x50/007bff/white?text=' + encodeURIComponent(name.charAt(0));
-            };
+        // 设置网站名称
+        if (nameElement) {
+            nameElement.textContent = name;
         }
         
-        // 设置链接
-        if (linkElement) {
-            linkElement.href = link;
+        // 设置网站描述
+        if (descElement) {
+            descElement.textContent = description;
         }
         
-        // 创建列表项容器，添加响应式类
-        const listItem = document.createElement('li');
-        listItem.className = `${columnClass} col-6 col-sm-4 col-lg-3`;
-        listItem.appendChild(card);
+        // 设置Logo
+        if (logoElement) {
+            if (iconUrl && iconUrl.startsWith('http')) {
+                logoElement.src = iconUrl;
+            } else if (link && link !== "#") {
+                logoElement.src = `https://www.google.com/s2/favicons?domain=${new URL(link).hostname}&sz=32`;
+            } else {
+                logoElement.src = `https://www.google.com/s2/favicons?domain=example.com&sz=32`;
+            }
+            logoElement.alt = `${name}图标`;
+        }
         
-        console.log('网站卡片创建成功:', name);
-        return listItem;
+        // 设置链接和点击事件
+        if (cardElement && link !== "#") {
+            cardElement.onclick = () => window.open(link, '_blank');
+            cardElement.style.cursor = 'pointer';
+            cardElement.classList.add('clickable');
+        }
+        
+        return card;
     }
     
     // 创建分类区域的函数
-    window.createCategorySection = function(title, iconClass, cards) {
-        console.log('创建分类区域:', title);
+    function createCategorySection(title, iconClass, cards) {
+        
         // 克隆分类区域模板
         const template = document.getElementById('category-section-template');
         const section = template.content.cloneNode(true);
@@ -125,8 +126,8 @@
     }
     
     // 创建国家/地区站点卡片的函数
-    window.createCountryCard = function(name, iconUrl, link = "#") {
-        console.log('创建国家卡片:', name, '图标URL:', iconUrl);
+    function createCountryCard(name, iconUrl, link = "#") {
+        
         
         // 克隆国家卡片模板
         const template = document.getElementById('country-card-template');
@@ -139,69 +140,74 @@
         
         // 设置卡片内容
         const nameElement = card.querySelector('.country-name');
-        const imgElement = card.querySelector('.country-img');
+        const iconElement = card.querySelector('.country-img');
         const linkElement = card.querySelector('.country-link');
         
         if (nameElement) nameElement.textContent = name;
-        if (imgElement) {
-            imgElement.src = iconUrl || 'https://placehold.co/32x24/007bff/white?text=' + encodeURIComponent(name.charAt(0));
-            imgElement.alt = name;
-            imgElement.onerror = function() {
-                console.warn('国家图标加载失败，使用备用图标:', iconUrl);
-                this.src = 'https://placehold.co/32x24/007bff/white?text=' + encodeURIComponent(name.charAt(0));
-            };
+        if (iconElement) {
+            iconElement.src = iconUrl;
+            iconElement.alt = `${name}图标`;
         }
-        if (linkElement) {
+        if (linkElement && link !== "#") {
             linkElement.href = link;
-            // 添加触摸友好的交互
-            linkElement.addEventListener('touchstart', function() {
-                this.style.opacity = '0.7';
-            });
-            linkElement.addEventListener('touchend', function() {
-                this.style.opacity = '1';
-            });
+            linkElement.target = '_blank';
         }
         
-        console.log('国家卡片创建成功:', name);
         return card;
-    };
+    }
     
-    // 创建国家/地区站点区域的函数
+    // 创建国家站点集合的函数
     function createCountrySites(countries) {
-        console.log('创建国家/地区站点区域');
+        
+        
         const container = document.createElement('div');
-        container.className = 'country-sites';
+        container.className = 'country-sites-container';
         
         const row = document.createElement('div');
-        row.className = 'row';
+        row.className = 'row g-2';
         
-        const col = document.createElement('div');
-        col.className = 'col-md-12';
+        const innerRow = document.createElement('ul');
+        innerRow.className = 'row g-2 list-unstyled';
         
-        const siteCard = document.createElement('div');
-        siteCard.className = 'site-card';
-        
-        const innerRow = document.createElement('div');
-        innerRow.className = 'row';
-        
-        // 添加国家卡片
         countries.forEach(country => {
             innerRow.appendChild(createCountryCard(country.name, country.icon, country.link));
         });
         
+        const siteCard = document.createElement('div');
+        siteCard.className = 'site-card p-3';
+        
         siteCard.appendChild(innerRow);
+        
+        const col = document.createElement('div');
+        col.className = 'col-12';
         col.appendChild(siteCard);
+        
         row.appendChild(col);
         container.appendChild(row);
         
         return container;
     }
 
-    // 将所有函数绑定到window对象，确保全局可访问
+    // 立即将所有函数绑定到window对象，确保全局可访问
     window.createWebsiteCard = createWebsiteCard;
     window.createCategorySection = createCategorySection;
     window.createCountryCard = createCountryCard;
     window.createCountrySites = createCountrySites;
     
-    console.log('卡片函数已绑定到window对象');
+    
+    
+    
+    
+    
+    
+    // 触发自定义事件，通知函数已加载
+    if (typeof window.CustomEvent !== 'undefined') {
+        const event = new CustomEvent('cardFunctionsLoaded', {
+            detail: {
+                functions: ['createWebsiteCard', 'createCategorySection', 'createCountryCard', 'createCountrySites']
+            }
+        });
+        window.dispatchEvent(event);
+        
+    }
 </script>

@@ -7,7 +7,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="导航管理">
+    <!-- 阻止浏览器请求Vite客户端文件 -->
+    <meta name="vite-dev-server" content="false">
+    <meta name="dev-server" content="false">
     <title>跨境电商工具导航 - 管理后台</title>
+    <!-- 网站图标 -->
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
@@ -78,7 +83,7 @@
                 </div>
                 <div class="header-right">
                     <div class="admin-user">
-                        <img src="https://via.placeholder.com/40" alt="管理员头像" class="admin-avatar">
+                        <img src="../assets/images/admin-avatar.svg" alt="管理员头像" class="admin-avatar">
                         <span class="admin-name d-none d-sm-inline">管理员</span>
                         <i class="bi bi-chevron-down"></i>
                     </div>
@@ -91,8 +96,8 @@
                 <div class="content-section active" id="dashboard">
                     <h2>控制面板</h2>
                     <div class="dashboard-stats">
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3">
+                        <div class="row g-4">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="stat-card">
                                     <div class="stat-icon bg-primary">
                                         <i class="bi bi-folder"></i>
@@ -103,7 +108,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="stat-card">
                                     <div class="stat-icon bg-success">
                                         <i class="bi bi-globe"></i>
@@ -114,7 +119,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="stat-card">
                                     <div class="stat-icon bg-info">
                                         <i class="bi bi-eye"></i>
@@ -125,7 +130,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="stat-card">
                                     <div class="stat-icon bg-warning">
                                         <i class="bi bi-people"></i>
@@ -197,6 +202,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>分类名称</th>
+                                    <th class="d-none d-lg-table-cell">英文名称</th>
                                     <th class="d-none d-md-table-cell">图标</th>
                                     <th class="d-none d-sm-table-cell">网站数量</th>
                                     <th>操作</th>
@@ -232,9 +238,11 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>网站名称</th>
+                                    <th class="d-none d-lg-table-cell">英文名称</th>
                                     <th class="d-none d-md-table-cell">图标</th>
                                     <th class="d-none d-sm-table-cell">分类</th>
                                     <th class="d-none d-lg-table-cell">描述</th>
+                                    <th class="d-none d-xl-table-cell">英文描述</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -426,80 +434,7 @@
         </div>
     </div>
 
-    <!-- 模态框 - 添加分类 -->
-    <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">添加分类</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="category-form">
-                        <div class="mb-3">
-                            <label for="category-name" class="form-label">分类名称</label>
-                            <input type="text" class="form-control" id="category-name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="category-icon" class="form-label">图标类名</label>
-                            <input type="text" class="form-control" id="category-icon" placeholder="bi-folder">
-                            <div class="form-text">使用Bootstrap Icons类名，例如：bi-folder</div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="save-category">保存</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 模态框 - 添加网站 -->
-    <div class="modal fade" id="websiteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">添加网站</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="website-form">
-                        <div class="mb-3">
-                            <label for="website-name" class="form-label">网站名称</label>
-                            <input type="text" class="form-control" id="website-name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="website-url" class="form-label">网站URL</label>
-                            <input type="url" class="form-control" id="website-url" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="website-category" class="form-label">所属分类</label>
-                            <select class="form-select" id="website-category" required>
-                                <option value="">选择分类</option>
-                                <option value="1">数据分析工具</option>
-                                <option value="2">关键词工具</option>
-                                <option value="3">物流工具</option>
-                                <option value="4">支付工具</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="website-icon" class="form-label">网站图标URL</label>
-                            <input type="url" class="form-control" id="website-icon">
-                        </div>
-                        <div class="mb-3">
-                            <label for="website-desc" class="form-label">网站描述</label>
-                            <textarea class="form-control" id="website-desc" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="save-website">保存</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 静态模态框已移除，改为使用JavaScript动态创建 -->
 
     <!-- 模态框 - 添加/编辑快捷导航 -->
     <div class="modal fade" id="navigationModal" tabindex="-1" aria-hidden="true">
