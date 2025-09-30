@@ -260,7 +260,13 @@ function createCategorySection(category) {
                     <div class="tool-card">
                         <a href="${tool.url}" target="_blank" class="text-decoration-none">
                             <div class="tool-icon">
-                                <i class="bi ${tool.icon || 'bi-link-45deg'}"></i>
+                                ${tool.icon && tool.icon !== 'Logo' && !String(tool.icon).startsWith('bi-') ? 
+                                    `<img src="${tool.icon}" alt="${tool.name}" style="width: 24px; height: 24px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                                     <span style="display: none;">Logo</span>` :
+                                    tool.icon && String(tool.icon).startsWith('bi-') ?
+                                    `<i class="bi ${tool.icon}"></i>` :
+                                    `<span>Logo</span>`
+                                }
                             </div>
                             <div class="tool-info">
                                 <div class="tool-header">

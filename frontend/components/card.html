@@ -73,14 +73,14 @@
         const logoElement = card.querySelector('.card-logo');
         const cardElement = card.querySelector('.website-card');
         
-        // 设置网站名称
+        // 设置网站名称（最多8个字，超出显示...）
         if (nameElement) {
-            nameElement.textContent = name;
+            nameElement.textContent = name.length > 8 ? name.substring(0, 8) + '...' : name;
         }
         
-        // 设置网站描述
+        // 设置网站描述（最多12个字，超出显示...）
         if (descElement) {
-            descElement.textContent = description;
+            descElement.textContent = description && description.length > 12 ? description.substring(0, 12) + '...' : description;
         }
         
         // 设置Logo
@@ -193,21 +193,4 @@
     window.createCategorySection = createCategorySection;
     window.createCountryCard = createCountryCard;
     window.createCountrySites = createCountrySites;
-    
-    
-    
-    
-    
-    
-    
-    // 触发自定义事件，通知函数已加载
-    if (typeof window.CustomEvent !== 'undefined') {
-        const event = new CustomEvent('cardFunctionsLoaded', {
-            detail: {
-                functions: ['createWebsiteCard', 'createCategorySection', 'createCountryCard', 'createCountrySites']
-            }
-        });
-        window.dispatchEvent(event);
-        
-    }
 </script>

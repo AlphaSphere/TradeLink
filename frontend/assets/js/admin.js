@@ -768,11 +768,21 @@ async function loadWebsites() {
         
         websites.forEach(website => {
             const row = document.createElement('tr');
+            const iconField = website.icon || '';
+            const isUrlIcon = iconField && (iconField.startsWith('/assets/') || iconField.startsWith('http'));
+            const isBiIcon = iconField && iconField.startsWith('bi-');
+            const iconHtml = isUrlIcon
+                ? `<img src="${iconField}" alt="${website.name}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="display:none;">Logo</span>`
+                : isBiIcon
+                    ? `<i class="bi ${iconField}"></i>`
+                    : `<span>Logo</span>`;
+
             row.innerHTML = `
                 <td>${website.id}</td>
                 <td>${website.name}</td>
                 <td class="d-none d-lg-table-cell">${website.name_en || '-'}</td>
-                <td class="d-none d-md-table-cell"><i class="${website.icon}"></i></td>
+                <td class="d-none d-md-table-cell">${iconHtml}</td>
                 <td class="d-none d-sm-table-cell">${website.category_id}</td>
                 <td class="d-none d-lg-table-cell">${website.description || '无描述'}</td>
                 <td class="d-none d-xl-table-cell">${website.description_en || '-'}</td>
@@ -967,9 +977,23 @@ async function showAddWebsiteModal() {
                     const formData = new FormData();
                     formData.append('file', iconFile);
                     
-                    const uploadResponse = await fetch('/api/upload-icon', {
-                        method: 'POST',
-                        body: formData
+                    // 使用XMLHttpRequest直连后端API端口，避免经由前端静态服务导致501
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'http://localhost:5002/api/upload-icon', true);
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    
+                    const uploadResponse = await new Promise((resolve, reject) => {
+                        xhr.onload = function() {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
+                            } else {
+                                reject(new Error('上传失败: ' + xhr.statusText));
+                            }
+                        };
+                        xhr.onerror = function() {
+                            reject(new Error('网络错误'));
+                        };
+                        xhr.send(formData);
                     });
                     
                     if (uploadResponse.ok) {
@@ -1103,9 +1127,28 @@ async function showEditWebsiteModal(tool) {
                     const formData = new FormData();
                     formData.append('file', iconFile);
                     
-                    const uploadResponse = await fetch('/api/upload-icon', {
-                        method: 'POST',
-                        body: formData
+                    // 使用XMLHttpRequest替代fetch进行文件上传
+                    const xhr = new XMLHttpRequest();
+                    // 直接请求后端API端口，避免经由前端静态服务导致501
+                    xhr.open('POST', 'http://localhost:5002/api/upload-icon', true);
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    
+                    // 创建一个Promise来处理XMLHttpRequest
+                    const uploadResponse = await new Promise((resolve, reject) => {
+                        xhr.onload = function() {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                resolve({
+                                    ok: true,
+                                    json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                                });
+                            } else {
+                                reject(new Error('上传失败: ' + xhr.statusText));
+                            }
+                        };
+                        xhr.onerror = function() {
+                            reject(new Error('网络错误'));
+                        };
+                        xhr.send(formData);
                     });
                     
                     if (uploadResponse.ok) {

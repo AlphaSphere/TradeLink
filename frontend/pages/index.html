@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="跨境电商工具导航">
@@ -13,8 +14,8 @@
     <title>跨境电商工具导航</title>
     <!-- 网站图标 -->
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.ico">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/language-switcher.css">
     <!-- 引入数据和脚本 - 确保api.js先加载 -->
@@ -64,71 +65,151 @@
                 loadComponent('../components/footer.html', 'footer-component'),
                 loadComponent('../components/card.html', 'card-component')
             ]).then(() => {
+                console.log('所有组件加载完成');
                 
-                
-                // 等待卡片函数加载完成
-                const checkCardFunctions = () => {
-                    if (typeof window.createCountryCard === 'function' && 
-                        typeof window.createWebsiteCard === 'function' &&
-                        typeof window.createCategorySection === 'function') {
-                        
-                        if (!window.pageInitialized) {
-                            initializeIndexPage();
-                        }
-                    } else {
-                        
-                        // 如果超过5次检查仍未加载成功，则强制初始化页面
-                        if (!window.cardFunctionCheckCount) {
-                            window.cardFunctionCheckCount = 1;
-                        } else {
-                            window.cardFunctionCheckCount++;
-                        }
-                        
-                        if (window.cardFunctionCheckCount > 5) {
-                            console.warn('卡片函数加载超时，强制初始化页面');
-                            // 定义缺失的函数以避免错误
-                            if (typeof window.createCountryCard !== 'function') {
-                                window.createCountryCard = function(name, iconUrl, link) {
-                                    console.warn('使用临时createCountryCard函数');
-                                    const li = document.createElement('li');
-                                    li.textContent = name;
-                                    return li;
-                                };
-                            }
-                            if (typeof window.createWebsiteCard !== 'function') {
-                                window.createWebsiteCard = function(name, description) {
-                                    console.warn('使用临时createWebsiteCard函数');
-                                    const div = document.createElement('div');
-                                    div.textContent = name;
-                                    return div;
-                                };
-                            }
-                            if (typeof window.createCategorySection !== 'function') {
-                                window.createCategorySection = function(title, iconClass, cards) {
-                                    console.warn('使用临时createCategorySection函数');
-                                    const section = document.createElement('section');
-                                    section.textContent = title;
-                                    return section;
-                                };
-                            }
-                            
-                            if (!window.pageInitialized) {
-                                initializeIndexPage();
-                            }
-                        } else {
-                            setTimeout(checkCardFunctions, 200);
-                        }
+                // 直接检查卡片函数是否已加载（卡片组件是立即定义函数的）
+                if (typeof window.createCountryCard === 'function' && 
+                    typeof window.createWebsiteCard === 'function' &&
+                    typeof window.createCategorySection === 'function') {
+                    console.log('卡片函数已就绪，开始初始化页面');
+                    if (!window.pageInitialized) {
+                        initializeIndexPage();
                     }
-                };
-                
-                // 开始检查卡片函数
-                checkCardFunctions();
-                
+                } else {
+                    console.log('卡片函数未就绪，启动快速检查机制');
+                    // 使用更快速的检查机制
+                    checkCardFunctionsQuick();
+                }
             }).catch(error => {
                 console.error('组件加载失败:', error);
-                alert('页面组件加载失败，请刷新页面重试');
+                // 即使组件加载失败，也尝试初始化页面
+                setTimeout(() => {
+                    window.cardFunctionCheckCount = 0;
+                    checkCardFunctions();
+                }, 1000);
             });
+            
+            // 快速检查机制（最多检查3次，每次100ms）
+            function checkCardFunctionsQuick() {
+                if (typeof window.createCountryCard === 'function' && 
+                    typeof window.createWebsiteCard === 'function' &&
+                    typeof window.createCategorySection === 'function') {
+                    console.log('快速检查：卡片函数已就绪，开始初始化页面');
+                    if (!window.pageInitialized) {
+                        initializeIndexPage();
+                    }
+                    return;
+                }
+                
+                if (!window.quickCheckCount) {
+                    window.quickCheckCount = 1;
+                } else {
+                    window.quickCheckCount++;
+                }
+                
+                console.log(`快速检查第${window.quickCheckCount}次...`);
+                
+                if (window.quickCheckCount >= 3) {
+                    console.log('快速检查超时，使用标准检查机制');
+                    window.cardFunctionCheckCount = 0;
+                    checkCardFunctions();
+                } else {
+                    setTimeout(checkCardFunctionsQuick, 100);
+                }
+            }
         });
+
+        // 卡片函数检查逻辑（作为备用方案）
+        function checkCardFunctions() {
+            if (typeof window.createCountryCard === 'function' && 
+                typeof window.createWebsiteCard === 'function' &&
+                typeof window.createCategorySection === 'function') {
+                
+                console.log('卡片函数检查通过，开始初始化页面');
+                if (!window.pageInitialized) {
+                    initializeIndexPage();
+                }
+            } else {
+                // 如果超过5次检查仍未加载成功，则强制初始化页面
+                if (!window.cardFunctionCheckCount) {
+                    window.cardFunctionCheckCount = 1;
+                } else {
+                    window.cardFunctionCheckCount++;
+                }
+                
+                console.log(`第${window.cardFunctionCheckCount}次检查卡片函数...`);
+                
+                if (window.cardFunctionCheckCount > 5) {
+                    console.warn('卡片函数加载超时，强制初始化页面');
+                    // 定义缺失的函数以避免错误
+                    if (typeof window.createCountryCard !== 'function') {
+                        window.createCountryCard = function(name, iconUrl, link) {
+                            console.warn('使用临时createCountryCard函数');
+                            const li = document.createElement('li');
+                            li.className = 'country-item col-6 col-sm-4 col-md-3 col-lg-2';
+                            li.innerHTML = `<a href="${link || '#'}" class="country-link text-decoration-none" target="_blank">
+                                <div class="country-card-content p-2 text-center">
+                                    <span class="country-icon d-block mb-1">
+                                        <img src="${iconUrl || ''}" alt="${name}" class="country-img" width="32" height="24">
+                                    </span>
+                                    <span class="country-name small text-truncate d-block">${name}</span>
+                                </div>
+                            </a>`;
+                            return li;
+                        };
+                    }
+                    if (typeof window.createWebsiteCard !== 'function') {
+                        window.createWebsiteCard = function(name, description, iconUrl, link) {
+                            console.warn('使用临时createWebsiteCard函数');
+                            const div = document.createElement('div');
+                            div.className = 'col-md-4 col-sm-6 col-12 mb-3';
+                            div.innerHTML = `<div class="website-card h-100">
+                                <div class="website-card-content d-flex align-items-center p-3">
+                                    <div class="website-logo me-3 flex-shrink-0">
+                                        <img src="${iconUrl || 'https://www.google.com/s2/favicons?domain=example.com&sz=32'}" alt="${name}图标" class="card-logo">
+                                    </div>
+                                    <div class="website-info flex-grow-1 min-width-0">
+                                        <div class="website-name fw-bold mb-1 text-truncate">${name}</div>
+                                        <div class="website-desc text-muted small">${description || '点击访问'}</div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            if (link && link !== '#') {
+                                div.onclick = () => window.open(link, '_blank');
+                                div.style.cursor = 'pointer';
+                            }
+                            return div;
+                        };
+                    }
+                    if (typeof window.createCategorySection !== 'function') {
+                        window.createCategorySection = function(title, iconClass, cards) {
+                            console.warn('使用临时createCategorySection函数');
+                            const section = document.createElement('section');
+                            section.className = 'category-section';
+                            section.innerHTML = `<header class="section-title d-flex justify-content-between align-items-center">
+                                <div><i class="bi ${iconClass || 'bi-folder'}"></i> <span class="title-text">${title}</span></div>
+                                <a href="#" class="text-decoration-none small d-none d-sm-inline">
+                                    查看更多 <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </header>
+                            <div class="card-container row g-2 g-md-3"></div>`;
+                            
+                            const container = section.querySelector('.card-container');
+                            if (cards && Array.isArray(cards)) {
+                                cards.forEach(card => container.appendChild(card));
+                            }
+                            return section;
+                        };
+                    }
+                    
+                    if (!window.pageInitialized) {
+                        initializeIndexPage();
+                    }
+                } else {
+                    setTimeout(checkCardFunctions, 500); // 增加重试间隔到500ms
+                }
+            }
+        }
         
         // 辅助函数：加载组件
         function loadComponent(url, containerId) {
@@ -299,7 +380,7 @@
     <div id="footer-component"></div>
 
     <!-- JavaScript 引入 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     
     <!-- 移动端交互脚本 -->
     <script>
@@ -422,7 +503,8 @@
         }
         
         function bookmarkWebsite() {
-            alert('请使用浏览器的收藏功能添加书签');
+            // 已取消收藏浮窗，不执行任何操作
+            return;
         }
         
         function showFeedback() {

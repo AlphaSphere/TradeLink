@@ -9,6 +9,35 @@
     --sidebar-width: 240px;
 }
 
+/* 文字截断全局样式 */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+
+/* 工具名称和网站名称截断样式 */
+.tool-name, .website-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+    max-width: 100px; /* 限制最大宽度 */
+}
+
+/* 工具描述和网站描述截断样式 */
+.tool-desc, .website-desc {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+    max-width: 120px; /* 限制最大宽度 */
+}
+
 body {
     font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #ffffff; /* 将灰色背景#f5f7fa更改为白色#ffffff */
@@ -1887,10 +1916,10 @@ body {
     font-weight: 600;
 }
 
-/* 工具分类容器样式 - 自适应布局设计，使用ul元素 */
+/* 工具分类容器样式 - 固定5列布局设计，使用ul元素 */
 .tools-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(calc(20% - 8px), 1fr)); /* 一行最多5个li，按比例划分 */
+    grid-template-columns: repeat(5, 1fr); /* 固定5列布局，每列等宽 */
     gap: 10px; /* 桌面端：li之间的间距设置为10px */
     margin-top: 15px;
     padding: 0;
@@ -1966,15 +1995,14 @@ body {
 .tool-icon {
     width: 40px; /* 设置为40px宽度 */
     height: 40px; /* 设置为40px高度 */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: transparent; /* 分类容器logo背景设为透明 */
     border-radius: 6px; /* 稍微增加圆角 */
     display: flex;
     align-items: center; /* 垂直居中对齐 */
     justify-content: center;
-    color: #ffffff;
+    color: #6a737d; /* 纯图标时使用中性深色 */
     font-size: 16px; /* 增加图标字体大小以匹配40x40尺寸 */
     flex-shrink: 0; /* 防止图标被压缩 */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* 增强阴影效果 */
     margin-right: 2px; /* 与文字内容保持适当间距 */
 }
 
@@ -2041,7 +2069,7 @@ body {
 /* 响应式设计 - 优化卡片布局显示 */
 @media (max-width: 1200px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fit, minmax(calc(20% - 8px), 1fr)); /* 中等屏幕：一行最多5个li，按比例划分 */
+        grid-template-columns: repeat(5, 1fr); /* 中等屏幕：保持5列布局 */
         gap: 8px; /* 中等屏幕：li之间的间距设置为8px */
         justify-content: start; /* 左对齐 */
     }
@@ -2071,7 +2099,7 @@ body {
 
 @media (max-width: 768px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fit, minmax(calc(25% - 6px), 1fr)); /* 平板屏幕：一行最多4个li，按比例划分 */
+        grid-template-columns: repeat(4, 1fr); /* 平板屏幕：4列布局 */
         gap: 8px; /* 平板屏幕：li之间的间距设置为8px */
         justify-content: start; /* 左对齐 */
     }
@@ -2118,7 +2146,7 @@ body {
 
 @media (max-width: 480px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fit, minmax(calc(33.33% - 6px), 1fr)); /* 移动端：一行最多3个li，按比例划分 */
+        grid-template-columns: repeat(3, 1fr); /* 移动端：3列布局 */
         gap: 8px; /* 移动端：li之间的间距设置为8px */
         justify-content: start; /* 左对齐 */
     }
@@ -2166,7 +2194,7 @@ body {
 /* 超小屏幕适配 */
 @media (max-width: 360px) {
     .tools-container {
-        grid-template-columns: repeat(auto-fit, minmax(calc(50% - 4px), 1fr)); /* 超小屏幕：一行最多2个li，按比例划分 */
+        grid-template-columns: repeat(2, 1fr); /* 超小屏幕：2列布局 */
         gap: 6px; /* 超小屏幕：li之间的间距设置为6px */
         justify-content: start; /* 左对齐 */
     }
@@ -2806,5 +2834,66 @@ body {
     
     .footer {
         background: var(--card-bg);
+    }
+}
+
+/* Tooltip 气泡样式 */
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 250px;
+    word-wrap: break-word;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tooltip 显示状态 */
+.tooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Tooltip 箭头 */
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+/* 暗色模式下的 Tooltip */
+@media (prefers-color-scheme: dark) {
+    .tooltip {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+    }
+    
+    .tooltip::before {
+        border-top-color: rgba(255, 255, 255, 0.95);
+    }
+}
+
+/* 高对比度模式下的 Tooltip */
+@media (prefers-contrast: high) {
+    .tooltip {
+        background: #000;
+        color: #fff;
+        border: 1px solid #fff;
+    }
+    
+    .tooltip::before {
+        border-top-color: #000;
     }
 }

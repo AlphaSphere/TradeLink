@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             switchToSite('TradeLink');
         }, 100);
+        
+        // 初始化Tooltip功能
+        setTimeout(() => {
+            initTooltip();
+        }, 200);
     }
     
     // 主题切换功能在所有页面都可用
@@ -620,7 +625,7 @@ function createSiteToolCard(tool) {
     toolCard.className = 'tool-card-item';
     
     toolCard.innerHTML = `
-        <div class="tool-card">
+        <div class="tool-card" data-description="${tool.description || '点击访问'}">
             <a href="${tool.url}" target="_blank" class="text-decoration-none">
                 <div class="tool-icon">
                     ${tool.icon && tool.icon !== 'Logo' && !tool.icon.startsWith('bi-') ? 
@@ -633,9 +638,9 @@ function createSiteToolCard(tool) {
                 </div>
                 <div class="tool-info">
                     <div class="tool-header">
-                        <div class="tool-name">${tool.name}</div>
+                        <div class="tool-name">${tool.name.length > 8 ? tool.name.substring(0, 8) + '...' : tool.name}</div>
                     </div>
-                    <div class="tool-desc">${(tool.description || '点击访问').length > 15 ? (tool.description || '点击访问').substring(0, 15) + '...' : (tool.description || '点击访问')}</div>
+                    <div class="tool-desc">${(tool.description || '点击访问').length > 12 ? (tool.description || '点击访问').substring(0, 12) + '...' : (tool.description || '点击访问')}</div>
                 </div>
             </a>
         </div>
@@ -912,3 +917,94 @@ function showAlert(message, type = 'info') {
 
 // 导出showAlert函数供其他模块使用
 window.showAlert = showAlert;
+
+// Tooltip 功能实现
+let currentTooltip = null;
+
+// 初始化 Tooltip 功能
+function initTooltip() {
+    // 创建 tooltip 元素
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    document.body.appendChild(tooltip);
+    currentTooltip = tooltip;
+    
+    // 使用事件委托监听鼠标事件
+    document.addEventListener('mouseenter', function(e) {
+        // 安全检查：确保target是元素节点且有classList属性
+        if (!e.target || !e.target.classList) return;
+        
+        // 检查是否是 tool-card 元素
+        if (e.target.classList.contains('tool-card') || e.target.closest('.tool-card')) {
+            const toolCard = e.target.classList.contains('tool-card') ? e.target : e.target.closest('.tool-card');
+            const description = toolCard.getAttribute('data-description');
+            
+            if (description && description.trim() !== '') {
+                showTooltip(e, description);
+            }
+        }
+    }, true);
+    
+    document.addEventListener('mouseleave', function(e) {
+        // 安全检查：确保target是元素节点且有classList属性
+        if (!e.target || !e.target.classList) return;
+        
+        // 检查是否是 tool-card 元素
+        if (e.target.classList.contains('tool-card') || e.target.closest('.tool-card')) {
+            hideTooltip();
+        }
+    }, true);
+    
+    // 鼠标移动时更新 tooltip 位置
+    document.addEventListener('mousemove', function(e) {
+        if (currentTooltip && currentTooltip.classList.contains('show')) {
+            updateTooltipPosition(e);
+        }
+    });
+}
+
+// 显示 Tooltip
+function showTooltip(event, text) {
+    if (!currentTooltip) return;
+    
+    currentTooltip.textContent = text;
+    currentTooltip.classList.add('show');
+    updateTooltipPosition(event);
+}
+
+// 隐藏 Tooltip
+function hideTooltip() {
+    if (currentTooltip) {
+        currentTooltip.classList.remove('show');
+    }
+}
+
+// 更新 Tooltip 位置
+function updateTooltipPosition(event) {
+    if (!currentTooltip) return;
+    
+    const tooltip = currentTooltip;
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let left = event.clientX - tooltipRect.width / 2;
+    let top = event.clientY - tooltipRect.height - 10; // 10px 间距
+    
+    // 防止 tooltip 超出视口边界
+    if (left < 10) {
+        left = 10;
+    } else if (left + tooltipRect.width > viewportWidth - 10) {
+        left = viewportWidth - tooltipRect.width - 10;
+    }
+    
+    if (top < 10) {
+        top = event.clientY + 10; // 如果上方空间不够，显示在下方
+    }
+    
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+}
+
+// 在 DOM 加载完成后初始化 Tooltip
+// 删除重复的DOMContentLoaded监听器

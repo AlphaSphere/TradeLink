@@ -19,7 +19,7 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "
      supports_credentials=True)
 
 # 配置文件上传
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'frontend', 'assets', 'uploads')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'frontend', 'assets', 'uploads', 'website-icons', 'logos')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -740,9 +740,27 @@ def upload_icon():
         if not allowed_file(file.filename):
             return jsonify({"error": "不支持的文件类型，请上传 PNG、JPG、JPEG、GIF、SVG 或 WEBP 格式的图片"}), 400
         
-        # 生成安全的文件名
-        filename = secure_filename(file.filename)
-        file_extension = filename.rsplit('.', 1)[1].lower()
+        # 生成安全的文件名并安全提取扩展名（兼容无扩展名文件）
+        filename = secure_filename(file.filename or '')
+        name_part, ext_part = os.path.splitext(filename)
+        file_extension = ext_part.lower().lstrip('.')
+
+        # 若无扩展名，尝试根据MIME类型推断
+        if not file_extension:
+            mime = getattr(file, 'mimetype', '')
+            mime_map = {
+                'image/png': 'png',
+                'image/jpeg': 'jpg',
+                'image/jpg': 'jpg',
+                'image/gif': 'gif',
+                'image/svg+xml': 'svg',
+                'image/webp': 'webp'
+            }
+            file_extension = mime_map.get(mime, '')
+
+        # 再次校验扩展名是否允许
+        if not file_extension or file_extension not in ALLOWED_EXTENSIONS:
+            return jsonify({"error": "不支持的文件类型，请上传 PNG、JPG、JPEG、GIF、SVG 或 WEBP 格式的图片"}), 400
         
         # 生成唯一的文件名，避免冲突
         unique_filename = f"{uuid.uuid4().hex}_{int(time.time())}.{file_extension}"
@@ -752,7 +770,7 @@ def upload_icon():
         file.save(file_path)
         
         # 返回文件的相对URL路径
-        icon_url = f"/assets/uploads/{unique_filename}"
+        icon_url = f"/assets/uploads/website-icons/logos/{unique_filename}"
         
         return jsonify({
             "message": "图标上传成功",
