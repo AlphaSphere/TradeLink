@@ -15,7 +15,7 @@
         </button>
         
         <!-- 导航菜单 - 强制支持左右滚动 -->
-        <div class="collapse navbar-collapse" id="navbarNav" style="display: flex !important; flex-direction: row !important; overflow-x: auto !important; white-space: nowrap !important; flex: 1 !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; -ms-overflow-style: none !important;">
+        <div class="collapse navbar-collapse" id="navbarNav" style="display: flex !important; flex-direction: row !important; flex: 1 !important;">
             <!-- 导航菜单左对齐显示 -->
             <ul class="navbar-nav" style="display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; white-space: nowrap !important; margin: 0 !important; padding-left: 10px !important;">
                 <li class="nav-item"><a class="nav-link active" href="index.html" data-lang="home">首页</a></li>
@@ -41,13 +41,13 @@
                 </div>
                 
                 <!-- 语言切换下拉菜单 -->
-                <div class="dropdown me-lg-2 mb-2 mb-lg-0">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropdown me-lg-2 mb-2 mb-lg-0" style="position: relative;">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                         <span class="flag-icon me-1" id="currentFlag">🇨🇳</span>
                         <span class="language-text d-none d-sm-inline" id="currentLanguage">中文</span>
                         <span class="language-text d-sm-none" id="currentLanguageShort">中</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown" style="z-index: 9999; margin-top: 2px; left: 0; right: auto;">
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" onclick="switchLanguage('zh', '🇨🇳', '中文', '中')">
                                 <span class="flag-icon me-2">🇨🇳</span>

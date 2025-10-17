@@ -98,7 +98,22 @@ const languageConfig = {
             hotItem1Title: 'TradeLink研究院',
             hotItem1Desc: '亚马逊卖家必备',
             hotItem2Title: '卖家之家',
-            hotItem2Desc: '跨境电商资讯平台'
+            hotItem2Desc: '跨境电商资讯平台',
+            // 底部 Footer 文案（中文）
+            footerTitle: 'TradeLink',
+            footerDesc1: '全球电商指南',
+            footerDesc2: '帮助卖家在全球取得成功',
+            footerLinks: '链接',
+            aboutUs: '关于我们',
+            businessCooperation: '商务合作',
+            friendlyLinks: '友情链接',
+            termsOfService: '服务条款',
+            disclaimer: '免责声明',
+            userFeedback: '用户反馈',
+            copyright: '版权',
+            privacyPolicy: '隐私政策',
+            customerWechat: '客服微信',
+            copyrightInfo: 'Copyright © 2018-2024 | 京ICP备案号 | 京公网安 35023116001882/08 | 本站内容来源于网络 | 不良信息举报'
         }
     },
     en: {
@@ -108,88 +123,107 @@ const languageConfig = {
         translations: {
             // 导航菜单
             home: 'Home',
-            hotTrends: 'Hot Trends',
-            hotTrendsShort: 'Trends',
-            globalNav: 'Global Nav',
+            hotTrends: 'Hot',
+            hotTrendsShort: 'Hot',
+            globalNav: 'Global',
             amazon: 'Amazon',
-            sellerTools: 'Seller Tools',
-            community: 'Community',
-            communityShort: 'Community',
-            logistics: 'Logistics',
-            logisticsShort: 'Logistics',
-            crossBorder: 'Cross-border',
-            dataTools: 'Data Tools',
-            toolbox: 'Toolbox',
+            sellerTools: 'Tools',
+            community: 'Forum',
+            communityShort: 'Forum',
+            logistics: 'Ship',
+            logisticsShort: 'Ship',
+            crossBorder: 'Global',
+            dataTools: 'Data',
+            toolbox: 'Tools',
             // 搜索和登录
-            searchPlaceholder: 'Search tools or websites...',
+            searchPlaceholder: 'Search...',
             login: 'Login',
-            register: 'Register',
-            loginRegister: 'Login/Register',
-            member: 'Member',
+            register: 'Sign Up',
+            loginRegister: 'Login',
+            member: 'User',
             // 时间显示
-            usTime: 'US Time',
+            usTime: 'US',
             usTimeShort: 'US',
-            ukTime: 'UK Time',
+            ukTime: 'UK',
             ukTimeShort: 'UK',
-            deTime: 'DE Time',
+            deTime: 'DE',
             deTimeShort: 'DE',
-            cnTime: 'CN Time',
+            cnTime: 'CN',
             cnTimeShort: 'CN',
             // 主页内容
-            navigationMenu: 'Navigation Menu',
-            searchPlaceholderMain: 'Enter keywords to search...',
+            navigationMenu: 'Menu',
+            searchPlaceholderMain: 'Search...',
             baiduSearch: 'Baidu',
             googleSearch: 'Google',
             bingSearch: 'Bing',
             yahooSearch: 'Yahoo',
             yandexSearch: 'Yandex',
-            usTimeLabel: 'US Time: ',
-            ukTimeLabel: 'UK Time: ',
-            deTimeLabel: 'DE Time: ',
-            cnTimeLabel: 'CN Time: ',
+            usTimeLabel: 'US: ',
+            ukTimeLabel: 'UK: ',
+            deTimeLabel: 'DE: ',
+            cnTimeLabel: 'CN: ',
             tradeLink: 'TradeLink',
             ebay: 'eBay',
             shopify: 'Shopify',
-            tiktokShop: 'TikTok Shop',
-            aliexpress: 'AliExpress',
+            tiktokShop: 'TikTok',
+            aliexpress: 'Ali',
             wish: 'Wish',
-            crossBorderEcommerce: 'Cross-border E-commerce',
-            amazonTraining: 'Amazon Training',
-            amazonTools: 'Amazon Tools',
+            crossBorderEcommerce: 'Global',
+            amazonTraining: 'Training',
+            amazonTools: 'Tools',
             shareTitle: 'Share',
-            bookmarkTitle: 'Bookmark',
+            bookmarkTitle: 'Save',
             feedbackTitle: 'Feedback',
+            businessContact: 'Business',
             // 侧边栏内容
-            sidebarCategoriesTitle: 'Categories',
-            sidebarCategoriesTitleShort: 'Categories',
-            closeSidebar: 'Close',
+            sidebarCategoriesTitle: 'Menu',
+            sidebarCategoriesTitleShort: 'Menu',
+            closeSidebar: 'X',
             homeRecommendation: 'Home',
             hotRecommendationTitle: 'Hot',
             hotRecommendationTitleShort: 'Hot',
-            hotWebsite: 'Hot Site',
+            hotWebsite: 'Top',
             hotItem1Title: 'TradeLink',
-            hotItem1Desc: 'For Amazon Sellers',
-            hotItem2Title: 'Seller Home',
-            hotItem2Desc: 'E-commerce News'
+            hotItem1Desc: 'For Sellers',
+            hotItem2Title: 'Seller',
+            hotItem2Desc: 'News',
+            // Footer内容
+            footerTitle: 'TradeLink',
+            footerDesc1: 'Global E-commerce Guide',
+            footerDesc2: 'Help sellers succeed globally',
+            footerLinks: 'Links',
+            aboutUs: 'About',
+            businessCooperation: 'Business',
+            friendlyLinks: 'Partners',
+            termsOfService: 'Terms',
+            disclaimer: 'Disclaimer',
+            userFeedback: 'Feedback',
+            copyright: 'Copyright',
+            privacyPolicy: 'Privacy',
+            customerWechat: 'Support',
+            copyrightInfo: 'Copyright © 2018-2024 | ICP License | Security 35023116001882/08'
         }
     }
 };
 
 // 初始化语言切换功能
 function initLanguageSwitcher() {
-    // 检查是否是首次访问（通过检查是否有访问标记）
-    const hasVisited = localStorage.getItem('hasVisited');
+    // 检查本地存储中的语言设置
+    const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
     
-    if (!hasVisited) {
-        // 首次访问，强制显示英文并标记已访问
-        localStorage.setItem('hasVisited', 'true');
-        localStorage.setItem('selectedLanguage', 'en');
-        applyLanguage('en');
+    // 保存语言设置
+    localStorage.setItem('hasVisited', 'true');
+    localStorage.setItem('selectedLanguage', savedLanguage);
+    
+    // 更新语言按钮显示
+    if (savedLanguage === 'zh') {
+        updateLanguageButton('🇨🇳', '中文', '中');
     } else {
-        // 非首次访问，从本地存储获取保存的语言，默认为英文
-        const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
-        applyLanguage(savedLanguage);
+        updateLanguageButton('🇺🇸', 'English', 'EN');
     }
+    
+    // 应用保存的语言
+    applyLanguage(savedLanguage);
 }
 
 // 切换语言函数
@@ -206,6 +240,17 @@ function switchLanguage(langCode, flag, name, shortName) {
     // 显示切换成功提示
     const message = langCode === 'zh' ? '语言已切换为中文' : 'Language switched to English';
     showAlert(message, 'success');
+    
+    // 强制刷新DOM以确保所有元素正确显示
+    setTimeout(() => {
+        document.querySelectorAll('[data-lang]').forEach(el => {
+            const key = el.getAttribute('data-lang');
+            const translations = languageConfig[langCode].translations;
+            if (translations[key]) {
+                el.textContent = translations[key];
+            }
+        });
+    }, 100);
 }
 
 // 更新语言按钮显示
@@ -243,6 +288,12 @@ function applyLanguage(langCode) {
     updateElementText('[data-lang="crossBorder"]', translations.crossBorder);
     updateElementText('[data-lang="dataTools"]', translations.dataTools);
     updateElementText('[data-lang="toolbox"]', translations.toolbox);
+    
+    // 更新移动端导航菜单
+    const mobileNavHome = document.getElementById('mobile-nav-home');
+    const mobileNavHot = document.getElementById('mobile-nav-hot');
+    if (mobileNavHome) updateElementText('#mobile-nav-home', translations.home);
+    if (mobileNavHot) updateElementText('#mobile-nav-hot', translations.hotTrendsShort);
     
     // 更新按钮和表单文本
     updateElementText('[data-lang="login"]', translations.login);
@@ -296,12 +347,30 @@ function applyLanguage(langCode) {
     updateTitle('[data-lang-title="shareTitle"]', translations.shareTitle);
     updateTitle('[data-lang-title="bookmarkTitle"]', translations.bookmarkTitle);
     updateTitle('[data-lang-title="feedbackTitle"]', translations.feedbackTitle);
+    updateTitle('[data-lang-title="businessContact"]', translations.businessContact);
+    updateElementText('[data-lang="businessContact"]', translations.businessContact);
     
     // 侧边栏内容翻译
     // 侧边栏标题
     updateElementText('[data-lang="sidebarCategoriesTitle"]', translations.sidebarCategoriesTitle);
     updateElementText('[data-lang="sidebarCategoriesTitleShort"]', translations.sidebarCategoriesTitleShort);
     updateTitle('[data-lang-title="closeSidebar"]', translations.closeSidebar);
+    
+    // Footer内容翻译
+    updateElementText('[data-lang="footerTitle"]', translations.footerTitle);
+    updateElementText('[data-lang="footerDesc1"]', translations.footerDesc1);
+    updateElementText('[data-lang="footerDesc2"]', translations.footerDesc2);
+    updateElementText('[data-lang="footerLinks"]', translations.footerLinks);
+    updateElementText('[data-lang="aboutUs"]', translations.aboutUs);
+    updateElementText('[data-lang="businessCooperation"]', translations.businessCooperation);
+    updateElementText('[data-lang="friendlyLinks"]', translations.friendlyLinks);
+    updateElementText('[data-lang="termsOfService"]', translations.termsOfService);
+    updateElementText('[data-lang="disclaimer"]', translations.disclaimer);
+    updateElementText('[data-lang="userFeedback"]', translations.userFeedback);
+    updateElementText('[data-lang="copyright"]', translations.copyright);
+    updateElementText('[data-lang="privacyPolicy"]', translations.privacyPolicy);
+    updateElementText('[data-lang="customerWechat"]', translations.customerWechat);
+    updateElementText('[data-lang="copyrightInfo"]', translations.copyrightInfo);
     
     // 首页推荐
     updateElementText('[data-lang="homeRecommendation"]', translations.homeRecommendation);

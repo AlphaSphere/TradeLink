@@ -90,3 +90,7 @@ coverage/
 # 依赖锁定文件（可选，根据项目需要）
 # package-lock.json
 # yarn.lock
+
+# Python 虚拟环境
+.venv/
+venv/

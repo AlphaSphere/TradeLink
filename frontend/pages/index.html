@@ -66,6 +66,10 @@
                 loadComponent('../components/card.html', 'card-component')
             ]).then(() => {
                 console.log('所有组件加载完成');
+                const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+                if (typeof window.applyLanguage === 'function') {
+                    window.applyLanguage(savedLanguage);
+                }
                 
                 // 直接检查卡片函数是否已加载（卡片组件是立即定义函数的）
                 if (typeof window.createCountryCard === 'function' && 
@@ -362,14 +366,11 @@
                 
                 <!-- 侧边工具栏 -->
                 <div class="side-toolbar d-none d-md-flex">
-                    <button class="toolbar-btn" data-lang-title="shareTitle" title="分享" onclick="shareWebsite()">
+                    <button class="toolbar-btn" title="分享" onclick="shareWebsite()">
                         <i class="bi bi-share"></i>
                     </button>
-                    <button class="toolbar-btn" data-lang-title="bookmarkTitle" title="收藏" onclick="bookmarkWebsite()">
-                        <i class="bi bi-bookmark"></i>
-                    </button>
-                    <button class="toolbar-btn" data-lang-title="feedbackTitle" title="反馈" onclick="showFeedback()">
-                        <i class="bi bi-chat-dots"></i>
+                    <button class="toolbar-btn" title="商务合作" data-lang-title="businessContact" onclick="showBusinessContact()">
+                        <i class="bi bi-briefcase"></i>
                     </button>
                 </div>
             </div>
@@ -379,8 +380,60 @@
     <!-- 底部信息组件 -->
     <div id="footer-component"></div>
 
+    <!-- 商务合作联系方式弹窗 -->
+    <div class="modal fade" id="businessContactModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-lang="businessContact">商务合作</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><i class="bi bi-chat-dots me-2"></i>微信</div>
+                            <div>
+                                <code id="wechat-id">ThisDay_Chen</code>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyText('ThisDay_Chen')">复制</button>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><i class="bi bi-whatsapp me-2"></i>WhatsApp</div>
+                            <div>
+                                <a href="https://wa.me/18666877674" target="_blank" rel="noopener">+86 18666877674</a>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyText('18666877674')">复制</button>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><i class="bi bi-envelope me-2"></i>邮箱</div>
+                            <div>
+                                <a href="mailto:jaden.ecc@gmail.com">jaden.ecc@gmail.com</a>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyText('jaden.ecc@gmail.com')">复制</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript 引入 -->
     <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 初始化Bootstrap下拉菜单 -->
+    <script>
+        // 确保Bootstrap下拉菜单正确初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化所有下拉菜单
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
+    </script>
     
     <!-- 移动端交互脚本 -->
     <script>
@@ -507,8 +560,24 @@
             return;
         }
         
-        function showFeedback() {
-            alert('感谢您的反馈！请发送邮件至 feedback@example.com');
+        function showBusinessContact() {
+            const modalEl = document.getElementById('businessContactModal');
+            if (!modalEl) return;
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+
+        function copyText(text) {
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                // 轻量提示，无弹窗干扰
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed top-0 start-50 translate-middle-x p-2';
+                toast.style.zIndex = '1080';
+                toast.innerHTML = '<span class="badge bg-success">已复制</span>';
+                document.body.appendChild(toast);
+                setTimeout(() => document.body.removeChild(toast), 1200);
+            });
         }
         
         // 实时时间更新

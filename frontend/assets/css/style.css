@@ -38,6 +38,10 @@
     max-width: 120px; /* 限制最大宽度 */
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #ffffff; /* 将灰色背景#f5f7fa更改为白色#ffffff */
@@ -45,6 +49,17 @@ body {
     line-height: 1.6;
     /* 防止移动端横向滚动 */
     overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body > .container {
+    flex: 1 0 auto;
+}
+
+#footer-component {
+    margin-top: auto;
 }
 
 /* 容器居中样式 - 左右留白10% */
@@ -1724,6 +1739,15 @@ body {
 .toolbar-btn:hover {
     background-color: var(--primary-color);
     color: white;
+}
+
+/* 确保导航栏下拉菜单层级高于侧边工具栏与遮罩 */
+.navbar .dropdown-menu {
+    z-index: 9999 !important;
+    position: fixed !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
 }
 
 /* 响应式设计 - 移动端优化 */

@@ -65,7 +65,7 @@
     border: 1px solid #e0e6ed;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
+    z-index: 1200;
     min-width: 160px;
     opacity: 0;
     visibility: hidden;
